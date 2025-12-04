@@ -105,6 +105,15 @@ export const apiSlice = createApi({
         method : "GET"
       }),
       providesTags : ["address"]
+    }),
+
+    addAddress : builder.mutation({
+      query : (data) => ({
+        url : "/user/add-address",
+        method : "POST",
+        body : data
+      }),
+      invalidatesTags : ["address"]
     })
   }),
 });
@@ -121,5 +130,6 @@ export const {
   useRemoveCartItemMutation,
   useCreateReviewMutation,
   useGetReviewQuery,
-  useGetAllAddressQuery
+  useGetAllAddressQuery,
+  useAddAddressMutation
 } = apiSlice;

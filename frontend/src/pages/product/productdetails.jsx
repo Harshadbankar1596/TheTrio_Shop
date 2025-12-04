@@ -240,7 +240,6 @@ export default function ProductDetails() {
                 </button>
               </div>
 
-              {/* Add to cart */}
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -274,10 +273,33 @@ export default function ProductDetails() {
                   boxShadow: "0 12px 40px rgba(99,102,241,0.12)",
                 }}
                 whileTap={{ scale: 0.98 }}
+                // onClick={() => {
+                //   // send user to checkout with product id/qty (adjust as your app expects)
+                //   navigate("/checkout", {
+                //     state: { productId: product._id, qty, selectedSize , item : product , delivery : 40 },
+                //   });
+                // }}
+
                 onClick={() => {
-                  // send user to checkout with product id/qty (adjust as your app expects)
-                  navigate("/checkout", {
-                    state: { productId: product._id, qty, selectedSize },
+                  const price = product.finalPrice;
+                  const quantity = qty;
+                  const delivery = 40;
+
+                  const subtotal = price * quantity;
+                  const total = subtotal + delivery;
+
+                  navigate("/order", {
+                    state: {
+                      items: [
+                        {
+                          product: product,
+                          quantity: quantity,
+                        },
+                      ],
+                      subtotal,
+                      delivery,
+                      total,
+                    },
                   });
                 }}
                 className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-white/5 border border-white/8 text-white font-semibold"

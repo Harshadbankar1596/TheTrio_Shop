@@ -70,11 +70,17 @@ export default function Products({ products = [], loading, appliedFilters }) {
     try {
       e.preventDefault();
 
-      await addcart({
+     const res = await addcart({
         userId: user.id,
         productId,
       });
-      toast.success("Item Added");
+      if(res.error){
+        toast.error("Plies Login First");
+      }
+      else{
+        toast.success("Item Added");
+
+      }
     } catch (error) {
       toast.error("Error In Add to cart Login Again");
     } 

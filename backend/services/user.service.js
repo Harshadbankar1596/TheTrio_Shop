@@ -6,11 +6,21 @@ import Product from "../models/product.model.js";
 import Cart from "../models/cart.model.js";
 import UserAddress from "../models/useraddress.model.js";
 import Review from "../models/review.model.js";
+import validator from "validator";
 
 export const createUser = async (data) => {
   if (!data.email || !data.password || !data.name || !data.phone) {
     throw new Error("Missing required fields");
   }
+
+  if (!data.email || !validator.isEmail(data.email)) {
+    throw new Error("Invalid email address");
+  }
+
+  if (!data.phone || !validator.isMobilePhone(data.phone, "en-IN")) {
+    throw new Error("Invalid Indian phone number");
+  }
+
   data.password = await bcrypt.hash(data.password, 10);
   return await User.create(data);
 };

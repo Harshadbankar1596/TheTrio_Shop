@@ -211,10 +211,8 @@ export default function TheTrioCart() {
                       state: {
                         items,
                         subtotal,
-                        totalDiscount,
-                        delivery,
                         total,
-                        address: addresses?.[0] ?? null,
+                        delivery
                       },
                     })
                   }

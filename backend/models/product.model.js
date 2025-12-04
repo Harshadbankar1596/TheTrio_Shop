@@ -85,7 +85,7 @@ productSchema.index({
 });
 
 productSchema.pre("save", function () {
-    this.finalPrice = this.price - (this.price * this.discount) / 100;
+    this.finalPrice = Math.floor(this.price - (this.price * this.discount) / 100);
 });
 
 

@@ -33,7 +33,6 @@ const Verify = () => {
 
   return (
     <div className="flex items-center justify-center h-screen w-full bg-white">
-      {/* Spinner */}
       <div className="w-14 h-14 border-4 border-gray-300 border-t-orange-500 rounded-full animate-spin"></div>
     </div>
   );

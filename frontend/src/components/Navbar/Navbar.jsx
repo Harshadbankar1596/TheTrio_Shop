@@ -1,21 +1,23 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import Name from "../Name";
-import {
-  ShoppingBag,
-  Search,
-  User,
-  Menu,
-  X,
-  LogOut
-} from "lucide-react";
+import { ShoppingBag, Search, User as UserIcon, Menu, X, LogOut } from "lucide-react";
+import RegisterModal from "./register";
+import LoginModal from "./loginmodel";
+import UserComponent from "./user"; 
+import { useSelector, useDispatch } from "react-redux";
+import { setUser } from "../../redux/Admin/userSlice";
 
-const Navbar = ({ setShowLogin, token, setToken }) => {
+const Navbar = () => {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
+  const token = user?.token;
+
   const [menuOpen, setMenuOpen] = useState(false);
-  const [active, setActive] = useState("Home");
-  const [open, setOpen] = useState(false);
-
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [showUserCard, setShowUserCard] = useState(false);
 
   const navItems = [
     { label: "Home", to: "/" },
@@ -26,170 +28,165 @@ const Navbar = ({ setShowLogin, token, setToken }) => {
   ];
 
   const logout = () => {
+    dispatch(setUser({ user: {}, token: "" }));
     localStorage.removeItem("token");
-    setToken("");
   };
 
   return (
-    <motion.header
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, ease: "easeOut" }}
-      className="sticky top-0 z-50 backdrop-blur-xl bg-black/70 border-b border-white/10 shadow-lg"
-    >
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <>
+      {/* NAVBAR */}
+      <motion.header
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="sticky top-0 z-50 backdrop-blur-xl bg-black/70 border-b border-white/10 shadow-xl"
+      >
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 select-none">
-          <div className="leading-none">
-            <h1 className="text-white text-xl font-semibold tracking-wide">
-              <Name />
-            </h1>
-            <p className="text-xs text-white/60 tracking-wide">
-              Minimal Fashion
-            </p>
-          </div>
-        </Link>
-
-        {/* Desktop Menu */}
-        <ul className="hidden md:flex items-center gap-10">
-          {navItems.map((item) => (
-            <motion.li
-              key={item.label}
-              whileHover={{ scale: 1.05, y: -3 }}
-              onClick={() => setActive(item.label)}
-            >
-              <Link
-                to={item.to}
-                className={`relative text-sm tracking-wide ${active === item.label
-                  ? "text-white"
-                  : "text-white/70 hover:text-white"
-                  }`}
-              >
-                {item.label}
-
-                {active === item.label && (
-                  <motion.div
-                    layoutId="underline"
-                    className="absolute left-0 -bottom-1 h-[2px] w-full bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full"
-                  />
-                )}
-              </Link>
-            </motion.li>
-          ))}
-        </ul>
-
-        {/* Icons */}
-        <div className="flex items-center gap-6">
-          <motion.button whileHover={{ scale: 1.2 }}>
-            <Search size={20} className="text-white/80" />
-          </motion.button>
-
-          <motion.div whileHover={{ scale: 1.15 }} className="relative">
-            <Link to="/cart">
-              <ShoppingBag size={22} className="text-white/90" />
-            </Link>
-            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-indigo-400 rounded-full" />
-          </motion.div>
-
-          {token ? (
-            <div className="relative hidden md:block">
-              <motion.button
-                onMouseEnter={() => setOpen(true)}
-                onMouseLeave={() => setOpen(false)}
-                whileHover={{ scale: 1.15 }}
-              >
-                <User size={22} className="text-white/90" />
-              </motion.button>
-
-              <ul
-                onMouseEnter={() => setOpen(true)}
-                onMouseLeave={() => setOpen(false)}
-                className={`
-        absolute right-0 mt-3 w-40 bg-black/90 border border-white/10 shadow-xl rounded-xl
-        transition-all duration-200 backdrop-blur-xl
-        ${open ? "opacity-100 translate-y-0" : "opacity-0 pointer-events-none -translate-y-2"}
-      `}
-              >
-                <li className="px-4 py-2 text-white/80 hover:bg-white/10 cursor-pointer">
-                  <Link to="/myorders">Orders</Link>
-                </li>
-
-                <li
-                  onClick={logout}
-                  className="px-4 py-2 flex items-center gap-2 text-white/80 hover:bg-white/10 cursor-pointer"
-                >
-                  <LogOut size={18} /> Logout
-                </li>
-              </ul>
+          {/* LOGO */}
+          <Link to="/" className="flex items-center gap-2 select-none">
+            <div>
+              <h1 className="text-white text-xl font-semibold tracking-wide">
+                <Name />
+              </h1>
+              <p className="text-xs text-white/60">Minimal Fashion</p>
             </div>
-          ) : (
-            <button>Login</button>
-          )}
+          </Link>
 
+          {/* DESKTOP MENU */}
+          <ul className="hidden md:flex items-center gap-10">
+            {navItems.map((item) => (
+              <li key={item.label}>
+                <Link
+                  to={item.to}
+                  className="text-white/70 hover:text-white text-sm tracking-wide transition"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
 
-          <button className="md:hidden text-white" onClick={() => setMenuOpen(!menuOpen)}>
-            {menuOpen ? <X size={26} /> : <Menu size={26} />}
-          </button>
+          {/* ICONS + AUTH */}
+          <div className="flex items-center gap-6">
+
+            <Search size={20} className="text-white/80 cursor-pointer" />
+
+            <Link to="/cart">
+              <ShoppingBag size={22} className="text-white/90 cursor-pointer" />
+            </Link>
+
+            {/* ======== IF USER NOT LOGGED IN ======== */}
+            {!token ? (
+              <div className="hidden md:flex gap-4">
+                <button
+                  onClick={() => setShowLoginModal(true)}
+                  className="text-white/80 hover:text-white"
+                >
+                  Login
+                </button>
+
+                <button
+                  onClick={() => setShowRegisterModal(true)}
+                  className="text-white/80 hover:text-indigo-400"
+                >
+                  Register
+                </button>
+              </div>
+            ) : (
+              /* ======== USER PROFILE DROPDOWN ======== */
+              <div className="hidden md:block relative">
+                <motion.div
+                  onMouseEnter={() => setShowUserCard(true)}
+                  onMouseLeave={() => setShowUserCard(false)}
+                >
+                  <UserIcon size={24} className="text-white cursor-pointer" />
+
+                  {showUserCard && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute right-0 mt-3 w-56 bg-black/80 border border-white/10 
+                                 backdrop-blur-xl rounded-xl shadow-lg p-4 z-50"
+                    >
+                      {/* USER CARD */}
+                      <UserComponent user={user} />
+
+                      <div className="h-px bg-white/10 my-3"></div>
+
+                      <Link
+                        to="/myorders"
+                        className="block text-white/80 hover:text-white py-1"
+                      >
+                        My Orders
+                      </Link>
+
+                      <button
+                        onClick={logout}
+                        className="w-full text-left text-white/80 hover:text-white py-1"
+                      >
+                        <LogOut size={16} className="inline mr-2" />
+                        Logout
+                      </button>
+                    </motion.div>
+                  )}
+                </motion.div>
+              </div>
+            )}
+
+            {/* MOBILE MENU BUTTON */}
+            <button className="md:hidden text-white" onClick={() => setMenuOpen(!menuOpen)}>
+              {menuOpen ? <X size={26} /> : <Menu size={26} />}
+            </button>
+          </div>
         </div>
-      </div>
 
-      {
-        menuOpen && (
+        {/* MOBILE MENU */}
+        {menuOpen && (
           <motion.div
             initial={{ opacity: 0, y: -15 }}
             animate={{ opacity: 1, y: 0 }}
-            className="md:hidden bg-black/90 border-t border-white/10 backdrop-blur-xl"
+            className="md:hidden bg-black/90 border-t border-white/10 backdrop-blur-xl py-4"
           >
-            <ul className="
-  absolute right-0 mt-3 w-40 bg-black/90 border border-white/10 shadow-xl rounded-xl 
-  opacity-0 group-hover:opacity-100 
-  transition-opacity duration-300 ease-in-out 
-  pointer-events-none group-hover:pointer-events-auto
-  delay-150
-">
+            <ul className="space-y-4 px-6 text-white/80">
 
               {navItems.map((item) => (
                 <li key={item.label}>
                   <Link
                     to={item.to}
-                    onClick={() => {
-                      setActive(item.label);
-                      setMenuOpen(false);
-                    }}
-                    className="text-white/80 hover:text-white text-sm"
+                    onClick={() => setMenuOpen(false)}
+                    className="hover:text-white"
                   >
                     {item.label}
                   </Link>
                 </li>
               ))}
 
-              {token ? (
-                <li
-                  onClick={() => {
-                    logout();
-                    setMenuOpen(false);
-                  }}
-                  className="text-white/80 hover:text-white cursor-pointer"
-                >
-                  Logout
-                </li>
+              {!token ? (
+                <>
+                  <li onClick={() => { setShowLoginModal(true); setMenuOpen(false); }}>Login</li>
+                  <li onClick={() => { setShowRegisterModal(true); setMenuOpen(false); }}>Register</li>
+                </>
               ) : (
-                <li
-                  onClick={() => {
-                    setShowLogin(true);
-                    setMenuOpen(false);
-                  }}
-                  className="text-white/80 hover:text-white cursor-pointer"
-                >
-                  Login
-                </li>
+                <>
+                  <li>
+                    <Link to="/myorders" onClick={() => setMenuOpen(false)}>
+                      Orders
+                    </Link>
+                  </li>
+                  <li onClick={() => { logout(); setMenuOpen(false); }}>Logout</li>
+                </>
               )}
             </ul>
           </motion.div>
-        )
-      }
-    </motion.header >
+        )}
+      </motion.header>
+
+      {/* MODALS */}
+      {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
+      {showRegisterModal && <RegisterModal onClose={() => setShowRegisterModal(false)} />}
+    </>
   );
 };
 
