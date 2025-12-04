@@ -74,11 +74,10 @@ export default function Products({ products = [], loading, appliedFilters }) {
         userId: user.id,
         productId,
       });
-
       toast.success("Item Added");
     } catch (error) {
-      toast.error("Error In Add to cart");
-    }
+      toast.error("Error In Add to cart Login Again");
+    } 
   }
 
   const cardVariant = {

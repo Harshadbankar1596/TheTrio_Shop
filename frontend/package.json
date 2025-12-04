@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.11.0",
-    "axios": "^1.7.3",
+    "axios": "^1.13.2",
     "framer-motion": "^12.23.24",
     "hash-router": "^0.4.0",
     "lucide-react": "^0.554.0",

@@ -14,5 +14,8 @@ router.get("/cart/:userId" , userController.getCartItems)
 router.post("/add-address" ,userController.addAddress )
 router.get("/get-alladdress/:userId" , userController.getAllAddress)
 router.put("/remove-cartitem" , userController.removeCart)
+router.post("/create-review" , userController.createReview)
+router.get("/get-product-review/:ProductId" , userController.getReview)
+router.post("/checkoutpayment" , userController.CheckOutPayment)
 
 export default router;

@@ -1,217 +1,140 @@
-import React, { useContext, useEffect, useState } from "react";
-import { StoreContext } from "../../context/StoreContext";
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useGetAllAddressQuery } from "../../redux/Admin/userAPI";
 
 const PlaceOrder = () => {
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const user = useSelector((s) => s.user);
+  const { items, subtotal, delivery, total } = state || {};
 
-  const { getTotalCartAmount, token, food_list, cartItems, url } =
-    useContext(StoreContext);
+  // Fetch Address List from API
+  const { data } = useGetAllAddressQuery({ userId: user.id });
 
-  const [data, setData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    street: "",
-    city: "",
-    state: "",
-    zipcode: "",
-    country: "",
-    phone: "",
-  });
+  // Selected Address
+  const [selectedAddress, setSelectedAddress] = useState(null);
 
-  const onChangeHandler = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
-    setData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const placeOrder = async (event) => {
-    event.preventDefault();
-
-    let orderItems = [];
-    food_list.map((item) => {
-      if (cartItems[item._id] > 0) {
-        orderItems.push({ ...item, quantity: cartItems[item._id] });
-      }
-    });
-
-    let orderData = {
-      address: data,
-      items: orderItems,
-      amount: getTotalCartAmount() + 2,
-    };
-
-    let response = await axios.post(
-      url + "/api/order/place",
-      orderData,
-      { headers: { token } }
-    );
-
-    if (response.data.success) {
-      const { session_url } = response.data;
-      window.location.replace(session_url);
-    } else {
-      toast.error("Error!");
-    }
-  };
-
+  // Set default address after data loads
   useEffect(() => {
-    if (!token) {
-      toast.error("Please login first");
-      navigate("/cart");
-    } else if (getTotalCartAmount() === 0) {
-      toast.error("Please add items to cart");
-      navigate("/cart");
+    if (data?.Address?.length > 0) {
+      setSelectedAddress(data.Address[0]); // default first address
     }
-  }, [token]);
+  }, [data]);
+
+  // Load Razorpay Script
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) return resolve(true);
+
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  // Payment Handler
+  const startPayment = async () => {
+    if (!items?.length) return toast.error("No items found");
+    if (!selectedAddress) return toast.error("Please select an address");
+
+    const loaded = await loadRazorpayScript();
+    if (!loaded) return toast.error("Razorpay SDK failed to load");
+
+    try {
+      // Backend → Create order
+      const { data } = await axios.post(
+        "http://localhost:5000/api/user/checkoutpayment",
+        {
+          userId: user.id,
+          products: items.map((x) => ({
+            productId: x.product._id,
+            quantity: x.quantity,
+          })),
+          userAddressId: selectedAddress._id, // ✔ send selected address id
+        }
+      );
+
+      const order = data.order;
+
+      const options = {
+        key: "rzp_test_Rn8IK6gWbfPl97",
+        amount: order.amount,
+        currency: "INR",
+        name: "The Trio Shop",
+        description: "Order Payment",
+        order_id: order.id,
+        // timeout: 100000,
+
+        handler: function (response) {
+          toast.success("Payment Successful!");
+          navigate("/order-success", {
+            state: { orderId: response.razorpay_order_id, paymentId: response.razorpay_payment_id },
+          });
+        },
+
+        theme: { color: "#151b24" },
+      };
+
+      const razor = new window.Razorpay(options);
+      razor.open();
+    } catch (error) {
+      console.log(error);
+      toast.error("Payment failed");
+    }
+  };
 
   return (
-    <form
-      onSubmit={placeOrder}
-      className="w-full flex flex-col lg:flex-row gap-10 px-6 md:px-16 mt-16 mb-16"
-    >
-      {/* Left Section - Delivery Form */}
-      <div className="w-full lg:w-2/3 bg-white shadow-md p-8 rounded-xl">
+    <div className="text-white p-6">
+      <h1 className="text-2xl font-semibold mb-6">Review Your Order</h1>
 
-        <p className="text-2xl font-semibold text-gray-800 mb-6">
-          Delivery Information
-        </p>
+      {/* Address Selection */}
+      <div className="bg-black/40 p-4 rounded-xl border border-white/10 mb-6">
+        <h2 className="text-lg mb-4 font-semibold">Select Delivery Address</h2>
 
-        {/* First Name & Last Name */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <input
-            required
-            type="text"
-            name="firstName"
-            value={data.firstName}
-            onChange={onChangeHandler}
-            placeholder="First name"
-            className="border border-gray-300 px-4 py-2 rounded-lg focus:border-orange-500 focus:outline-none"
-          />
-
-          <input
-            required
-            type="text"
-            name="lastName"
-            value={data.lastName}
-            onChange={onChangeHandler}
-            placeholder="Last name"
-            className="border border-gray-300 px-4 py-2 rounded-lg focus:border-orange-500 focus:outline-none"
-          />
-        </div>
-
-        {/* Email */}
-        <input
-          required
-          type="text"
-          name="email"
-          value={data.email}
-          onChange={onChangeHandler}
-          placeholder="Email Address"
-          className="w-full mt-4 border border-gray-300 px-4 py-2 rounded-lg focus:border-orange-500 focus:outline-none"
-        />
-
-        {/* Street */}
-        <input
-          required
-          type="text"
-          name="street"
-          value={data.street}
-          onChange={onChangeHandler}
-          placeholder="Street"
-          className="w-full mt-4 border border-gray-300 px-4 py-2 rounded-lg focus:border-orange-500 focus:outline-none"
-        />
-
-        {/* City & State */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-          <input
-            required
-            type="text"
-            name="city"
-            value={data.city}
-            onChange={onChangeHandler}
-            placeholder="City"
-            className="border border-gray-300 px-4 py-2 rounded-lg focus:border-orange-500 focus:outline-none"
-          />
-
-          <input
-            required
-            type="text"
-            name="state"
-            value={data.state}
-            onChange={onChangeHandler}
-            placeholder="State"
-            className="border border-gray-300 px-4 py-2 rounded-lg focus:border-orange-500 focus:outline-none"
-          />
-        </div>
-
-        {/* Zipcode & Country */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-          <input
-            required
-            type="text"
-            name="zipcode"
-            value={data.zipcode}
-            onChange={onChangeHandler}
-            placeholder="Zip Code"
-            className="border border-gray-300 px-4 py-2 rounded-lg focus:border-orange-500 focus:outline-none"
-          />
-
-          <input
-            required
-            type="text"
-            name="country"
-            value={data.country}
-            onChange={onChangeHandler}
-            placeholder="Country"
-            className="border border-gray-300 px-4 py-2 rounded-lg focus:border-orange-500 focus:outline-none"
-          />
-        </div>
-
-        {/* Phone */}
-        <input
-          required
-          type="text"
-          name="phone"
-          value={data.phone}
-          onChange={onChangeHandler}
-          placeholder="Phone"
-          className="w-full mt-4 border border-gray-300 px-4 py-2 rounded-lg focus:border-orange-500 focus:outline-none"
-        />
+        {data?.Address?.length > 0 ? (
+          <div className="grid gap-4">
+            {data.Address.map((addr) => (
+              <div
+                key={addr._id}
+                onClick={() => setSelectedAddress(addr)}
+                className={`p-4 rounded-xl border cursor-pointer transition 
+                ${selectedAddress?._id === addr._id 
+                  ? "border-indigo-500 bg-indigo-500/20" 
+                  : "border-white/20 bg-white/10"}`}
+              >
+                <p className="font-semibold">{addr.addressLine1}</p>
+                <p>{addr.addressLine2}</p>
+                <p>
+                  {addr.city}, {addr.state} - {addr.postalCode}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p>No address found. Add one in Profile.</p>
+        )}
       </div>
 
-      {/* Right Section - Cart Total */}
-      <div className="w-full lg:w-1/3 bg-white shadow-md p-8 rounded-xl h-fit">
-        <h2 className="text-2xl font-bold mb-4 text-gray-800">Cart Totals</h2>
-
-        <div className="flex justify-between py-2 text-gray-700">
-          <p>Subtotal</p>
-          <p>${getTotalCartAmount()}</p>
-        </div>
-        <hr />
-
-        <div className="flex justify-between py-2 text-gray-700">
-          <p>Delivery Fee</p>
-          <p>${getTotalCartAmount() === 0 ? 0 : 2}</p>
-        </div>
-        <hr />
-
-        <div className="flex justify-between py-2 text-gray-900 font-semibold">
-          <p>Total</p>
-          <p>${getTotalCartAmount() === 0 ? 0 : getTotalCartAmount() + 2}</p>
-        </div>
+      {/* Order Summary */}
+      <div className="bg-black/40 p-4 rounded-xl border border-white/10">
+        <p>Total Items: {items?.length}</p>
+        <p>Subtotal: ₹{subtotal}</p>
+        <p>Delivery: ₹{delivery}</p>
+        <p className="font-bold text-xl mt-2">Grand Total: ₹{total}</p>
 
         <button
-          type="submit"
-          className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg mt-4 font-semibold transition"
+          onClick={startPayment}
+          className="mt-6 px-5 py-3 bg-indigo-500 rounded-lg text-black font-semibold w-full"
         >
-          PROCEED TO PAYMENT
+          Pay Now ₹{total}
         </button>
       </div>
-    </form>
+    </div>
   );
 };
 

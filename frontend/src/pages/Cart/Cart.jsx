@@ -1,48 +1,43 @@
 import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingBag, Trash2, MapPin , Loader} from "lucide-react";
-import { useGetCartItemsQuery, useRemoveCartItemMutation } from "../../redux/Admin/userAPI";
+import { ShoppingBag, Trash2, MapPin, Loader } from "lucide-react";
+import {
+  useGetCartItemsQuery,
+  useRemoveCartItemMutation,
+} from "../../redux/Admin/userAPI";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { useState } from "react";
+import axios from "axios";
 
-// ===============================
-//      THE TRIO CART (FINAL)
-// ===============================
 export default function TheTrioCart() {
   const user = useSelector((state) => state.user);
   const userId = user?.id || user?._id;
-  const [removeitem, { isLoading: loadingcart }] = useRemoveCartItemMutation()
-  const [ItemLoader , setItemLoader] = useState(null)
+  const [removeitem, { isLoading: loadingcart }] = useRemoveCartItemMutation();
+  const [ItemLoader, setItemLoader] = useState(null);
 
-  // Fetch server cart
   const { data, isLoading } = useGetCartItemsQuery(userId, { skip: !userId });
 
   const navigate = useNavigate();
 
-  // =============== DATA EXTRACTION ==================
-
-  // Address
   const addresses = data?.address ?? [];
 
-  // Items
   const rawItems = data?.data?.items ?? [];
 
   const items = rawItems.map((x) => ({
     product: x.product,
-    qty: x.quantity ?? x.qty ?? 1,
-    _id : x._id
+    quantity: x.quantity ?? x.quantity ?? 1,
+    _id: x._id,
   }));
 
-  // Totals
   const subtotal = items.reduce(
-    (acc, x) => acc + (x.product.finalPrice ?? x.product.price) * x.qty,
+    (acc, x) => acc + (x.product.finalPrice ?? x.product.price) * x.quantity,
     0
   );
 
   const originalTotal = items.reduce(
-    (acc, x) => acc + x.product.price * x.qty,
+    (acc, x) => acc + x.product.price * x.quantity,
     0
   );
 
@@ -53,7 +48,6 @@ export default function TheTrioCart() {
   const format = (n) =>
     n.toLocaleString("en-IN", { style: "currency", currency: "INR" });
 
-  // Framer motion preset
   const fadeUp = {
     hidden: { opacity: 0, y: 20 },
     visible: (i = 0) => ({
@@ -72,21 +66,19 @@ export default function TheTrioCart() {
     try {
       console.log(userId);
       console.log(cartId);
-      const res = await removeitem({userId, cartId})
-      if(res.error){
-        toast.error("error in remove item")
-        return
+      const res = await removeitem({ userId, cartId });
+      if (res.error) {
+        toast.error("error in remove item");
+        return;
       }
-      toast.success("Item Removed")
+      toast.success("Item Removed");
     } catch (error) {
-      toast.error("error in remove item")
+      toast.error("error in remove item");
     }
   }
 
   if (isLoading)
-    return (
-      <div className="text-center mt-20 text-white">Loading cart...</div>
-    );
+    return <div className="text-center mt-20 text-white">Loading cart...</div>;
 
   return (
     <div className="w-full px-6 md:px-16 mt-16 text-white">
@@ -135,13 +127,13 @@ export default function TheTrioCart() {
                   className="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md grid grid-cols-3 md:grid-cols-6 items-center gap-4"
                 >
                   {/* Image */}
-                  <div className="col-span-1">
+                  <Link to={`/product/${x.product._id}`} className="col-span-1">
                     <img
                       src={x.product.images[0]}
                       className="w-24 h-24 rounded-xl object-cover hover:scale-105 transition"
                       alt=""
                     />
-                  </div>
+                  </Link>
 
                   {/* Title */}
                   <div className="col-span-2">
@@ -149,7 +141,9 @@ export default function TheTrioCart() {
                     <p className="text-xs text-white/60">
                       Size: {x.product.sizes.join(", ")}
                     </p>
-                    <p className="text-xs text-white/60">Qty: {x.qty}</p>
+                    <p className="text-xs text-white/60">
+                      quantity: {x.quantity}
+                    </p>
                   </div>
 
                   {/* Price */}
@@ -159,17 +153,24 @@ export default function TheTrioCart() {
 
                   {/* Total */}
                   <div className="font-semibold text-white text-right md:text-left">
-                    {format(x.product.finalPrice)}
+                    {format(x.product.finalPrice * x.quantity)}
                   </div>
 
                   {/* Remove */}
                   <div className="text-right flex items-center justify-center">
-                    {loadingcart && ItemLoader === x._id? <Loader className="animate-spin" /> :<button onClick={()=>{
-                      removeitems(x._id);
-                      setItemLoader(x._id)
-                    }} className="px-3 py-2 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20">
-                      <Trash2 size={16} className="text-rose-400" />
-                    </button>}
+                    {loadingcart && ItemLoader === x._id ? (
+                      <Loader className="animate-spin" />
+                    ) : (
+                      <button
+                        onClick={() => {
+                          removeitems(x._id);
+                          setItemLoader(x._id);
+                        }}
+                        className="px-3 py-2 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20"
+                      >
+                        <Trash2 size={16} className="text-rose-400" />
+                      </button>
+                    )}
                   </div>
                 </motion.div>
               ))
