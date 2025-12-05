@@ -14,6 +14,10 @@ import { StoreContext } from "./context/StoreContext";
 import Products from "./pages/categoryproduct/products";
 import Productdetails from "./pages/product/productdetails";
 import MainSection from "./pages/categoryproduct/mainsection";
+import PrivacyPolicy from "./components/privecypolicy/privecypolicy";
+import ContactUs from "./components/contactus/contactus";
+import TermsOfService from "./components/terms/terms";
+import RefundPolicy from "./components/refundpolicy/refund";
 
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -41,6 +45,10 @@ const App = () => {
           <Route path="/category/:id" element={<MainSection />} />
           <Route path="/product/:id" element={<Productdetails />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/termcondition" element={<TermsOfService />} />
+          <Route path="/refundpolicy" element={<RefundPolicy />} />
         </Routes>
       </div>
 

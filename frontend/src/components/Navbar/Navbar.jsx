@@ -21,10 +21,10 @@ const Navbar = () => {
 
   const navItems = [
     { label: "Home", to: "/" },
-    { label: "Shirts", to: "/shirts" },
-    { label: "Pants", to: "/pants" },
-    { label: "T-Shirts", to: "/tshirts" },
-    { label: "New Arrivals", to: "/new" },
+    { label: "Contact Us", to: "/contact" },
+    { label: "Privacy & Policy", to: "/privacypolicy" },
+    { label: "Term & Condition", to: "/termcondition" },
+    { label: "Refund Policy", to: "/refundpolicy" },
   ];
 
   const logout = () => {

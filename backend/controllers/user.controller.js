@@ -174,7 +174,8 @@ const userController = {
       const cart = await addcartitem(
         req.body.userId,
         req.body.productId,
-        req.body.quantity
+        req.body.quantity,
+        req.body.size,
       );
       return res.status(200).json({
         success: true,

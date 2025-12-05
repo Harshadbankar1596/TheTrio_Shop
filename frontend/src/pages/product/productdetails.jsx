@@ -19,6 +19,7 @@ export default function ProductDetails() {
   const [addCartItem, { isLoading: loadingcartadd }] = useAddCartItemMutation();
   const userId = useSelector((user) => user.user.id);
   const product = data?.data || null;
+  // console.log(product);
 
   const [mainIndex, setMainIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0] || "");
@@ -254,6 +255,7 @@ export default function ProductDetails() {
                       userId: userId,
                       productId: product._id,
                       quantity: qty,
+                      size: selectedSize,
                     }).unwrap();
                     toast.success("Added to cart successfully!");
                   } catch (err) {
@@ -267,45 +269,44 @@ export default function ProductDetails() {
               </motion.button>
 
               {/* Buy now */}
-              <motion.button
-                whileHover={{
-                  scale: 1.02,
-                  boxShadow: "0 12px 40px rgba(99,102,241,0.12)",
-                }}
-                whileTap={{ scale: 0.98 }}
-                // onClick={() => {
-                //   // send user to checkout with product id/qty (adjust as your app expects)
-                //   navigate("/checkout", {
-                //     state: { productId: product._id, qty, selectedSize , item : product , delivery : 40 },
-                //   });
-                // }}
+              {!product.isActive ? (
+                <div className="text-red-500 flex items-center justify-center p-2">
+                  Out Of Stock
+                </div>
+              ) : (
+                <motion.button
+                  whileHover={{
+                    scale: 1.02,
+                    boxShadow: "0 12px 40px rgba(99,102,241,0.12)",
+                  }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => {
+                    const price = product.finalPrice;
+                    const quantity = qty;
+                    const delivery = 40;
 
-                onClick={() => {
-                  const price = product.finalPrice;
-                  const quantity = qty;
-                  const delivery = 40;
+                    const subtotal = price * quantity;
+                    const total = subtotal + delivery;
 
-                  const subtotal = price * quantity;
-                  const total = subtotal + delivery;
-
-                  navigate("/order", {
-                    state: {
-                      items: [
-                        {
-                          product: product,
-                          quantity: quantity,
-                        },
-                      ],
-                      subtotal,
-                      delivery,
-                      total,
-                    },
-                  });
-                }}
-                className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-white/5 border border-white/8 text-white font-semibold"
-              >
-                Buy Now
-              </motion.button>
+                    navigate("/order", {
+                      state: {
+                        items: [
+                          {
+                            product: product,
+                            quantity: quantity,
+                          },
+                        ],
+                        subtotal,
+                        delivery,
+                        total,
+                      },
+                    });
+                  }}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-white/5 border border-white/8 text-white font-semibold"
+                >
+                  Buy Now
+                </motion.button>
+              )}
             </div>
 
             {/* extra product meta */}

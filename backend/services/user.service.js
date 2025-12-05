@@ -55,13 +55,13 @@ export const getProductById = async (productId) => {
   return await Product.findById(productId).populate("category subCategory");
 };
 
-export const addcartitem = async (userId, productId, quantity) => {
+export const addcartitem = async (userId, productId, quantity , size) => {
   let cart = await Cart.findOne({ user: userId });
 
   if (!cart) {
     cart = await Cart.create({
       user: userId,
-      items: [{ product: productId, quantity }],
+      items: [{ product: productId, quantity , size}],
     });
     return cart;
   }
@@ -73,7 +73,7 @@ export const addcartitem = async (userId, productId, quantity) => {
   if (existingItem) {
     existingItem.quantity = quantity;
   } else {
-    cart.items.push({ product: productId, quantity });
+    cart.items.push({ product: productId, quantity , size});
   }
 
   await cart.save();
