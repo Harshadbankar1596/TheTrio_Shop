@@ -14,6 +14,7 @@ import {
   RemoveCart,
   CreateReview,
   GetReview,
+  verifyCupon,
 } from "../services/user.service.js";
 import generateToken from "../utils/generateJWT.js";
 
@@ -175,7 +176,7 @@ const userController = {
         req.body.userId,
         req.body.productId,
         req.body.quantity,
-        req.body.size,
+        req.body.size
       );
       return res.status(200).json({
         success: true,
@@ -266,6 +267,15 @@ const userController = {
     }
   },
 
+  VerifyCupon: async (req, res) => {
+    try {
+      const cupon = await verifyCupon(req.body.Code);
+      res.status(200).json({ message: "Sucsess", cupon });
+    } catch (error) {
+      res.status(500).json({ message: "Server Error" });
+    }
+  },
+
   CheckOutPayment: async (req, res) => {
     try {
       const { products, userId, userAddressId } = req.body;
@@ -299,8 +309,8 @@ const userController = {
           message: "Total amount must be at least Rs.1",
         });
       }
-// delavery charjess
-      amountInPaise += 40 * 100
+      // delavery charjess
+      amountInPaise += 40 * 100;
 
       const options = {
         amount: amountInPaise,
@@ -318,6 +328,8 @@ const userController = {
   },
 
   VerifyPayment: async (req, res) => {
+    console.log(req.body);
+    
     try {
       const {
         razorpay_order_id,
@@ -328,6 +340,8 @@ const userController = {
         userId,
         addressId,
         Products,
+        PaymentType,
+        CuponCode,
       } = req.body;
 
       if (
@@ -338,7 +352,8 @@ const userController = {
         !TotalDiscount ||
         !userId ||
         !addressId ||
-        !Products
+        !Products ||
+        !PaymentType
       ) {
         return res.status(400).json({ message: "All Fields Are Required" });
       }
@@ -356,15 +371,21 @@ const userController = {
       const order = await Order.create({
         razorpay_payment_id,
         razorpay_order_id,
+        PaymentType,
+        cuponCode : CuponCode || "",
         Products,
-        user: userId,
+        User: userId,
         TotalAmount,
         TotalDiscount,
         Address: addressId,
       });
 
       res.status(200).json({ message: "Order Successful", order });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+      
+      res.status(500).json({message : "Server Error" , Error : error} )
+    }
   },
 };
 export default userController;

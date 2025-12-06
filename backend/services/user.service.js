@@ -7,6 +7,7 @@ import Cart from "../models/cart.model.js";
 import UserAddress from "../models/useraddress.model.js";
 import Review from "../models/review.model.js";
 import validator from "validator";
+import Cupon from "../models/cupon.model.js";
 
 export const createUser = async (data) => {
   if (!data.email || !data.password || !data.name || !data.phone) {
@@ -55,13 +56,13 @@ export const getProductById = async (productId) => {
   return await Product.findById(productId).populate("category subCategory");
 };
 
-export const addcartitem = async (userId, productId, quantity , size) => {
+export const addcartitem = async (userId, productId, quantity, size) => {
   let cart = await Cart.findOne({ user: userId });
 
   if (!cart) {
     cart = await Cart.create({
       user: userId,
-      items: [{ product: productId, quantity , size}],
+      items: [{ product: productId, quantity, size }],
     });
     return cart;
   }
@@ -73,7 +74,7 @@ export const addcartitem = async (userId, productId, quantity , size) => {
   if (existingItem) {
     existingItem.quantity = quantity;
   } else {
-    cart.items.push({ product: productId, quantity , size});
+    cart.items.push({ product: productId, quantity, size });
   }
 
   await cart.save();
@@ -170,4 +171,18 @@ export const GetReview = async (ProductId) => {
     throw new Error("Review Not Found");
   }
   return review;
+};
+
+export const verifyCupon = async (code) => {
+  if (!code) {
+    throw new Error("COde Not Found");
+  }
+
+  const cupon = await Cupon.find({ code : code });
+
+  if (!cupon) {
+    throw new Error("Cupon Not Found");
+  }
+
+  return cupon;
 };

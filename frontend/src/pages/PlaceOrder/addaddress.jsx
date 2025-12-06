@@ -61,7 +61,7 @@ const AddAddressModal = ({ onClose }) => {
         variants={fadeUp}
         initial="hidden"
         animate="visible"
-        className="relative w-full max-w-md bg-black/60 border border-white/10 rounded-2xl shadow-[0_0_40px_rgba(99,102,241,0.35)] p-7"
+        className="relative w-full max-w-md bg-black/60 border border-white/10 rounded-2xl  p-7"
       >
         {/* Close Button */}
         <button
@@ -73,8 +73,8 @@ const AddAddressModal = ({ onClose }) => {
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-9 h-9 rounded-full bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center">
-            <MapPin size={18} className="text-indigo-300" />
+          <div className="w-9 h-9 rounded-full bg-green-500/20 border border-indigo-400/40 flex items-center justify-center">
+            <MapPin size={18} className="text-yellow-300" />
           </div>
           <div>
             <h2 className="text-white text-lg font-semibold tracking-wide">
@@ -205,7 +205,7 @@ const AddAddressModal = ({ onClose }) => {
               whileTap={{ scale: 0.97 }}
               type="submit"
               disabled={isLoading}
-              className="px-5 py-2 text-xs md:text-sm rounded-full bg-indigo-500 text-black font-semibold shadow-[0_0_25px_rgba(99,102,241,0.6)] disabled:opacity-60"
+              className="px-5 py-2 text-xs md:text-sm rounded-full bg-yellow-500 text-black font-semibold  disabled:opacity-60"
             >
               {isLoading ? "Saving..." : "Save Address"}
             </motion.button>

@@ -43,7 +43,7 @@ const ExploreMenu = ({ category, setCategory }) => {
         )}
 
         {categories.map((item, index) => (
-          <Link to={`/category/${item._id}`}>
+          <Link key={index} to={`/category/${item._id}`}>
             <motion.div
               key={item._id}
               onClick={() =>

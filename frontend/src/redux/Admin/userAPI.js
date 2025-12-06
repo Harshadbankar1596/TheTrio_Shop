@@ -99,6 +99,14 @@ export const apiSlice = createApi({
       providesTags : ["review"]
     }),
 
+    verifyCupon : builder.mutation({
+      query : ({Code}) => ({
+        url :  `/user/verifycupon`,
+        method : "POST",
+        body : {Code}
+      })
+    }),
+
     getAllAddress : builder.query({
       query : ({userId}) => ({
         url : `/user/get-alladdress/${userId}`,
@@ -131,5 +139,6 @@ export const {
   useCreateReviewMutation,
   useGetReviewQuery,
   useGetAllAddressQuery,
-  useAddAddressMutation
+  useAddAddressMutation,
+  useVerifyCuponMutation
 } = apiSlice;

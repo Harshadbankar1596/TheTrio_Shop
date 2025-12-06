@@ -87,7 +87,7 @@ export default function TheTrioCart() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-white/5 border border-white/10 rounded-xl">
-              <ShoppingBag size={20} className="text-indigo-400" />
+              <ShoppingBag size={20} className="text-green-400" />
             </div>
             <div>
               <h3 className="text-xl font-semibold">Your Cart</h3>
@@ -224,14 +224,14 @@ export default function TheTrioCart() {
                   onClick={() =>
                     !hasInactive &&
                     navigate("/order", {
-                      state: { items, subtotal, total, delivery },
+                      state: { items, subtotal, total, delivery , totalDiscount , cuponCode : 0},
                     })
-                  }
+                  } 
                   className={`w-full mt-4 py-3 rounded-full font-semibold transition 
                     ${
                       hasInactive
                         ? "bg-gray-600 cursor-not-allowed text-white/40"
-                        : "bg-indigo-400 text-black shadow-[0_0_25px_rgba(99,102,241,0.5)]"
+                        : "bg-green-400 text-black shadow-green-500"
                     }
                   `}
                 >
