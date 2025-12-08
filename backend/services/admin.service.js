@@ -1,5 +1,5 @@
 import Category from "../models/category.model.js";
-import SubCategory from "../models/subCategory.model.js";
+import SubCategory from "../models/subcategory.model.js";
 import Product from "../models/product.model.js";
 import Cupon from "../models/cupon.model.js";
 import Banner from "../models/banner.model.js";
