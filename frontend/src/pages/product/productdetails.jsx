@@ -553,6 +553,47 @@ export default function ProductDetails() {
             </div>
           </div>
 
+          {/* QUANTITY SELECTOR */}
+<div className="mt-4">
+  <p className="mb-2 text-gray-300">Quantity</p>
+
+  <div className="flex items-center gap-4">
+
+    {/* Minus Button */}
+    <button
+      onClick={() => qty > 1 && setQty(qty - 1)}
+      className="
+        w-10 h-10 flex items-center justify-center 
+        rounded-lg border border-gray-600 
+        text-xl hover:bg-[#222] transition
+      "
+    >
+      -
+    </button>
+
+    {/* Qty Display */}
+    <span className="text-xl font-semibold">{qty}</span>
+
+    {/* Plus Button */}
+    <button
+      onClick={() => qty < product.stock && setQty(qty + 1)}
+      className="
+        w-10 h-10 flex items-center justify-center 
+        rounded-lg border border-gray-600 
+        text-xl hover:bg-[#222] transition
+      "
+    >
+      +
+    </button>
+  </div>
+
+  {/* Stock Warning */}
+  <p className="text-gray-400 text-sm mt-1">
+    {product.stock} items available
+  </p>
+</div>
+
+
           {/* ACTION BUTTONS — EXACT SAME LAYOUT */}
           <div className="flex gap-4 mt-6">
             <button
@@ -603,11 +644,11 @@ export default function ProductDetails() {
                   const subtotal = qty * product.finalPrice;
                   navigate("/order", {
                     state: {
-                      items: [{ product, quantity: qty , size : selectedSize}],
+                      items: [{ product, quantity: qty, size: selectedSize }],
                       subtotal,
                       delivery: 40,
                       total: subtotal + 40,
-                      totalDiscount : product.price - product.finalPrice 
+                      totalDiscount: product.price - product.finalPrice,
                     },
                   });
                 }}
@@ -631,7 +672,9 @@ export default function ProductDetails() {
 
           {/* PRODUCT DETAILS BLOCKS (DOTS STYLE) */}
           <div className="flex items-center justify-between border-t border-[#2a2a2a] pt-5">
-            <span className="text-gray-300">Product Details : {product.description}</span>
+            <span className="text-gray-300">
+              Product Details : {product.description}
+            </span>
             <div className="flex gap-2">
               <span className="w-2 h-2 bg-white rounded-full"></span>
               <span className="w-2 h-2 bg-gray-500 rounded-full"></span>

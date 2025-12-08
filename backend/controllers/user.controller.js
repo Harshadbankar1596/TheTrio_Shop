@@ -15,6 +15,10 @@ import {
   CreateReview,
   GetReview,
   verifyCupon,
+  removecartItems,
+  getAllOrders,
+  cancleOrder,
+  getnewProducts
 } from "../services/user.service.js";
 import generateToken from "../utils/generateJWT.js";
 
@@ -328,8 +332,8 @@ const userController = {
   },
 
   VerifyPayment: async (req, res) => {
-    console.log(req.body);
-    
+    // console.log(req.body);
+
     try {
       const {
         razorpay_order_id,
@@ -345,9 +349,6 @@ const userController = {
       } = req.body;
 
       if (
-        !razorpay_order_id ||
-        !razorpay_payment_id ||
-        !razorpay_signature ||
         !TotalAmount ||
         !TotalDiscount ||
         !userId ||
@@ -358,34 +359,106 @@ const userController = {
         return res.status(400).json({ message: "All Fields Are Required" });
       }
 
-      const sign = razorpay_order_id + "|" + razorpay_payment_id;
-      const expectedSign = crypto
-        .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-        .update(sign)
-        .digest("hex");
+      const cart = await removecartItems({ userId });
+      // console.log("cart =>", cart);
 
-      if (razorpay_signature !== expectedSign) {
-        return res.status(400).json({ message: "Payment verification failed" });
+      if (PaymentType === "COD") {
+        const order = await Order.create({
+          PaymentType: "COD",
+          cuponCode: CuponCode || "",
+          Products,
+          User: userId,
+          TotalAmount,
+          TotalDiscount,
+          Address: addressId,
+          paymentStatus: "Pending",
+          razorpay_order_id: undefined,
+          razorpay_payment_id: undefined,
+          razorpay_signature: undefined,
+        });
+
+        return res.status(200).json({
+          message: "Order Placed Successfully (COD)",
+          order,
+        });
       }
 
-      const order = await Order.create({
-        razorpay_payment_id,
-        razorpay_order_id,
-        PaymentType,
-        cuponCode : CuponCode || "",
-        Products,
-        User: userId,
-        TotalAmount,
-        TotalDiscount,
-        Address: addressId,
-      });
+      if (PaymentType === "razorpay") {
+        if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+          return res
+            .status(400)
+            .json({ message: "Razorpay Payment Details Required" });
+        }
 
-      res.status(200).json({ message: "Order Successful", order });
+        const sign = razorpay_order_id + "|" + razorpay_payment_id;
+
+        const expectedSign = crypto
+          .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+          .update(sign)
+          .digest("hex");
+
+        if (razorpay_signature !== expectedSign) {
+          return res
+            .status(400)
+            .json({ message: "Payment verification failed" });
+        }
+
+        const order = await Order.create({
+          razorpay_payment_id,
+          razorpay_order_id,
+          PaymentType,
+          cuponCode: CuponCode || "",
+          Products,
+          User: userId,
+          TotalAmount,
+          TotalDiscount,
+          Address: addressId,
+          paymentStatus: "Paid",
+        });
+
+        return res.status(200).json({
+          message: "Order Successful (Online Payment)",
+          order,
+        });
+      }
+
+      return res.status(400).json({ message: "Invalid Payment Type" });
+    } catch (error) {
+      console.log(error);
+
+      res.status(500).json({ message: "Server Error", Error: error });
+    }
+  },
+
+  GetOrders: async (req, res) => {
+    try {
+      const orders = await getAllOrders(req.params.userId);
+      res.status(200).json({ message: "Success", Orders: orders });
     } catch (error) {
       console.log(error);
       
-      res.status(500).json({message : "Server Error" , Error : error} )
+      res.status(500).json({ message: "Server Error" });
     }
   },
+
+  CancleOrder : async (req , res) => {
+    try {
+      const order = await cancleOrder(req.body.orderId)
+      res.status(200).json({message : "Succsess" , Order : order})
+    } catch (error) {
+      console.log(error);
+      
+      res.status(500).json({message : "Server Error"})
+    }
+  },
+
+  GetNewProducts : async (req , res) => {
+    try {
+      const products = await getnewProducts()
+      res.status(200).json({message : "Success" , products})
+    } catch (error) {
+      res.status(500).json({message : "Server Error"})
+    }
+  }
 };
 export default userController;

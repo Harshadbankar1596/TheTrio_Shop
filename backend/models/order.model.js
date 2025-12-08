@@ -4,11 +4,9 @@ const UserOrderSchema = new mongoose.Schema(
   {
     razorpay_payment_id: {
       type: String,
-      unique : true
     },
     razorpay_order_id: {
       type: String,
-      unique : true
     },
     PaymentType: {
       type: String,
@@ -17,7 +15,7 @@ const UserOrderSchema = new mongoose.Schema(
 
     cuponCode: {
       type: String,
-      default : ""
+      default: "",
     },
 
     Products: [
@@ -70,6 +68,11 @@ const UserOrderSchema = new mongoose.Schema(
         "Cancelled",
       ],
       default: "Placed",
+    },
+
+    isCancel: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

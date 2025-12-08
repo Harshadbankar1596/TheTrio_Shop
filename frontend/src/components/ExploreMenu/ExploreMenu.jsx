@@ -11,7 +11,7 @@ const ExploreMenu = ({ category, setCategory }) => {
   return (
     <div
       id="explore-menu"
-      className="w-full px-6 md:px-16 py-10 select-none bg-black text-white"
+      className="w-full px-6 md:px-16 py-5 select-none bg-black text-white"
     >
       <motion.h1
         initial={{ opacity: 0, y: 40 }}

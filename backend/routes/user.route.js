@@ -22,5 +22,8 @@ router.get("/get-product-review/:ProductId", userController.getReview);
 router.post("/checkoutpayment", userController.CheckOutPayment);
 router.post("/verify-payment" , userController.VerifyPayment)
 router.post("/verifycupon" , userController.VerifyCupon)
+router.get("/get-orders/:userId" , userController.GetOrders)
+router.post("/cancle-order" , userController.CancleOrder)
+router.get("/get-new-products" , userController.GetNewProducts)
 
 export default router;

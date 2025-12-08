@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import Header from "../../components/Header/Header";
 import ExploreMenu from "../../components/ExploreMenu/ExploreMenu";
-import FoodDisplay from "../../components/collections/collections";
-
+import NewProducts from "../../components/newproducts/NewProducts"
 const Home = () => {
   const [category, setCategory] = useState("All");
 
@@ -23,19 +22,13 @@ const Home = () => {
       </section>
 
       {/* SPACING */}
-      <div className="mt-28" />
 
       {/* SECTION 3 — PRODUCT DISPLAY */}
       <section className="w-full">
-        <FoodDisplay category={category} />
+        <NewProducts />
       </section>
 
-      {/* SPACING */}
-      <div className="mt-28" />
-
-
-      {/* FINAL SPACE BEFORE FOOTER */}
-      <div className="mb-20" />
+      
     </div>
   );
 };

@@ -1,3 +1,8 @@
+import { motion } from "framer-motion";
+import React, { useEffect, useRef, useState } from "react";
+import { useGetBannerBynameQuery } from "../../redux/Admin/userAPI";
+import { ShirtViewer } from "../3D/ShirtViewer";
+
 function MagneticButton({ children, onClick, variant = "solid" }) {
   const wrapperRef = useRef(null);
   const innerRef = useRef(null);
@@ -9,7 +14,6 @@ function MagneticButton({ children, onClick, variant = "solid" }) {
     const x = e.clientX - (rect.left + rect.width / 2);
     const y = e.clientY - (rect.top + rect.height / 2);
 
-    // Strong magnetic pull but smooth
     innerRef.current.style.transform = `translate(${x * 0.15}px, ${
       y * 0.15
     }px)`;
@@ -36,10 +40,8 @@ function MagneticButton({ children, onClick, variant = "solid" }) {
           isGhost
             ? "bg-white/10 border border-white/20 text-white backdrop-blur-xl"
             : "bg-white text-black shadow-[0_10px_35px_rgba(255,255,255,0.25)]"
-        }
-        `}
+        }`}
     >
-      {/* INNER FLOATING LAYER (moves toward cursor) */}
       <span
         ref={innerRef}
         className="relative z-20 flex items-center gap-2 transition-transform duration-150"
@@ -47,7 +49,6 @@ function MagneticButton({ children, onClick, variant = "solid" }) {
         {children}
       </span>
 
-      {/* Neon TheTrio left accent line */}
       <span
         className="absolute left-0 top-0 bottom-0 w-[3px] bg-indigo-400/90"
         style={{ boxShadow: "0 0 10px rgba(99,102,241,0.8)" }}
@@ -56,23 +57,14 @@ function MagneticButton({ children, onClick, variant = "solid" }) {
   );
 }
 
-
-
-import { motion } from "framer-motion";
-import React, { useEffect, useRef, useState } from "react";
-import { useGetBannerBynameQuery } from "../../redux/Admin/userAPI";
-
 const Header = ({ setCategory = () => {} }) => {
   const ref = useRef(null);
-
-  const { data } = useGetBannerBynameQuery("home");
-
+  const { data : homepage} = useGetBannerBynameQuery("home");
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  // Track mouse movement for whole page
   useEffect(() => {
     function handleMove(e) {
-      const x = (e.clientX / window.innerWidth - 0.5) * 2; // -1 to 1
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;
       const y = (e.clientY / window.innerHeight - 0.5) * 2;
       setMousePos({ x, y });
     }
@@ -81,7 +73,6 @@ const Header = ({ setCategory = () => {} }) => {
     return () => window.removeEventListener("mousemove", handleMove);
   }, []);
 
-  // Background parallax
   useEffect(() => {
     function onScroll() {
       if (!ref.current) return;
@@ -97,21 +88,22 @@ const Header = ({ setCategory = () => {} }) => {
       ref={ref}
       className="relative h-[62vh] md:h-[75vh] text-white bg-black bg-cover bg-center overflow-hidden"
       style={{
-        backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.7)), url(${data?.data?.image})`,
+        backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.7)), url(${homepage?.data?.image})`,
       }}
     >
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
-      <div className="container mx-auto px-6 md:px-12 h-full flex items-center">
+      {/* FLEX: LEFT TEXT + RIGHT 3D MODEL */}
+      <div className="container mx-auto px-6 md:px-12 h-full flex items-center justify-between gap-8">
+        {/* LEFT TEXT */}
         <motion.div
           className="relative max-w-2xl"
           animate={{
-            x: mousePos.x * 15, // subtle horizontal move
-            y: mousePos.y * 15, // subtle vertical move
+            x: mousePos.x * 15,
+            y: mousePos.y * 15,
           }}
           transition={{ type: "spring", stiffness: 70, damping: 20 }}
         >
-          {/* H1 Title */}
           <motion.h1
             initial={{ opacity: 0, y: 40 }}
             animate={{
@@ -121,12 +113,11 @@ const Header = ({ setCategory = () => {} }) => {
               rotateY: mousePos.x * 4,
             }}
             transition={{ duration: 1 }}
-            className="text-4xl md:text-6xl font-bold leading-tight tracking-tight drop-shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
+            className="text-4xl md:text-6xl font-bold"
           >
             TheTrio — Crafted Minimal Fashion
           </motion.h1>
 
-          {/* Subtitle */}
           <motion.p
             initial={{ opacity: 0, y: 22 }}
             animate={{
@@ -136,14 +127,11 @@ const Header = ({ setCategory = () => {} }) => {
               y: mousePos.y * 8,
             }}
             transition={{ duration: 1, delay: 0.2 }}
-            className="mt-4 text-gray-200 max-w-xl leading-relaxed"
+            className="mt-4 text-gray-200 max-w-xl"
           >
-            Curated selection of premium Shirts, Pants, and T-Shirts. Luxurious
-            cuts. Modern silhouettes. Futuristic minimal design built for
-            timeless elegance.
+            Curated selection of premium Shirts, Pants, and T-Shirts.
           </motion.p>
 
-          {/* Buttons Group */}
           <motion.div
             initial={{ opacity: 0, y: 28 }}
             animate={{
@@ -159,14 +147,67 @@ const Header = ({ setCategory = () => {} }) => {
               Shop Shirts
             </MagneticButton>
 
-            <MagneticButton variant="ghost" onClick={() => setCategory("Pants")}>
+            <MagneticButton
+              variant="ghost"
+              onClick={() => setCategory("Pants")}
+            >
               Shop Pants
             </MagneticButton>
           </motion.div>
         </motion.div>
+        <Hover3DWrapper>
+          {/* <ShirtViewer /> */}
+          <div className="w-full h-full flex justify-center object-contain">
+            <img src="us.png" alt="" />
+          </div>
+        </Hover3DWrapper>
       </div>
     </section>
   );
 };
 
 export default Header;
+
+const Hover3DWrapper = ({ children, intensity = 1 }) => {
+  const ref = useRef(null);
+
+  function handleMouseMove(e) {
+    const rect = ref.current.getBoundingClientRect();
+
+    const x = e.clientX - (rect.left + rect.width / 2);
+    const y = e.clientY - (rect.top + rect.height / 2);
+
+    const rotateY = (x / rect.width) * intensity * 50;
+    const rotateX = -(y / rect.height) * intensity * 50;
+
+    ref.current.style.transform = `
+      perspective(900px)
+      rotateX(${rotateX}deg)
+      rotateY(${rotateY}deg)
+      scale(1.03)
+    `;
+  }
+
+  function handleMouseLeave() {
+    ref.current.style.transform = `
+      perspective(900px)
+      rotateX(0deg)
+      rotateY(0deg)
+      scale(1)
+    `;
+  }
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="transition-all flex justify-center items-center duration-300 ease-out w-full"
+      style={{
+        transformStyle: "preserve-3d",
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+};

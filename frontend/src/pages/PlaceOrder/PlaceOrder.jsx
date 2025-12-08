@@ -8,11 +8,12 @@ import {
   useVerifyCuponMutation,
 } from "../../redux/Admin/userAPI";
 import AddAddressModal from "./addaddress";
-import { CreditCard, Truck } from "lucide-react";
+import { CreditCard, Truck, Loader2 } from "lucide-react";
 
 const PlaceOrder = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
+  const [loading, setLoading] = useState(false);
   const user = useSelector((s) => s.user);
 
   // COUPON STATES
@@ -21,14 +22,13 @@ const PlaceOrder = () => {
   const [discountAmount, setDiscountAmount] = useState(0);
 
   // Trigger coupon API on click
- const [verifyCupon , {isLoading : loadingcupon}] = useVerifyCuponMutation()
+  const [verifyCupon, { isLoading: loadingcupon }] = useVerifyCuponMutation();
 
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("razorpay");
 
   let { items, subtotal, total, delivery, totalDiscount } = state || {};
   // console.log(totalDiscount);
-  
 
   // PRICE CALCULATION
   if (items?.length && (!subtotal || !total)) {
@@ -53,10 +53,10 @@ const PlaceOrder = () => {
   // APPLY COUPON HANDLER
   const applyCoupon = async () => {
     console.log(couponCode);
-    
+
     if (!couponCode) return toast.error("Please enter a coupon code");
 
-    const res = await verifyCupon({Code : couponCode});
+    const res = await verifyCupon({ Code: couponCode });
 
     if (res.error) {
       setVerifiedCoupon(null);
@@ -122,6 +122,7 @@ const PlaceOrder = () => {
     if (!loaded) return toast.error("Razorpay failed to load");
 
     try {
+      setLoading(true);
       const { data } = await axios.post(
         "http://localhost:5000/api/user/checkoutpayment",
         {
@@ -138,7 +139,7 @@ const PlaceOrder = () => {
       );
 
       const order = data.order;
-
+      setLoading(false);
       const options = {
         key: "rzp_test_Rn8IK6gWbfPl97",
         amount: order.amount * 100,
@@ -149,14 +150,14 @@ const PlaceOrder = () => {
         theme: { color: "#00c853" },
 
         handler: function (response) {
+          setLoading(false);
           toast.success("Payment Successful!");
-          console.log(response);
-          
+
           navigate("/success", {
             state: {
               orderId: response.razorpay_order_id,
               paymentId: response.razorpay_payment_id,
-              signature : response.razorpay_signature,
+              signature: response.razorpay_signature,
               paymenttype: "razorpay",
               Products: items,
               User: user,
@@ -228,7 +229,9 @@ const PlaceOrder = () => {
 
           {/* PAYMENT METHOD */}
           <div className="bg-[#141518] rounded-2xl p-6 border border-white/10 shadow-xl">
-            <h2 className="text-xl font-semibold mb-4">Select Payment Method</h2>
+            <h2 className="text-xl font-semibold mb-4">
+              Select Payment Method
+            </h2>
 
             <div className="space-y-4">
               {/* ONLINE PAYMENT */}
@@ -304,7 +307,8 @@ const PlaceOrder = () => {
 
             {verifiedCoupon && (
               <p className="text-green-400 mt-2 text-sm">
-                Coupon applied: {verifiedCoupon.code} — {verifiedCoupon.discount}% OFF
+                Coupon applied: {verifiedCoupon.code} —{" "}
+                {verifiedCoupon.discount}% OFF
               </p>
             )}
           </div>
@@ -325,18 +329,32 @@ const PlaceOrder = () => {
             Grand Total: <span className="text-green-400">₹{finalTotal}</span>
           </p>
 
-          <button
-            onClick={startPayment}
-            className="
+          <div className="flex items-center justify-center py-5">
+            {loading ? (
+              <div
+                className="flex items-center justify-center
+              mt-6 w-full py-4 rounded-xl font-semibold
+              bg-green-500 text-black text-lg tracking-wide
+              hover:bg-green-400 active:scale-95 transition"
+              >
+                <Loader2 className="animate-spin" />
+                <p>Loading</p>
+              </div>
+            ) : (
+              <button
+                onClick={startPayment}
+                className="
               mt-6 w-full py-4 rounded-xl font-semibold
               bg-green-500 text-black text-lg tracking-wide
               hover:bg-green-400 active:scale-95 transition
             "
-          >
-            {paymentMethod === "cod"
-              ? "Place COD Order"
-              : `Pay Securely ₹${finalTotal}`}
-          </button>
+              >
+                {paymentMethod === "cod"
+                  ? "Place COD Order"
+                  : `Pay Securely ₹${finalTotal}`}
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

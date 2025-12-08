@@ -122,6 +122,30 @@ export const apiSlice = createApi({
         body : data
       }),
       invalidatesTags : ["address"]
+    }),
+
+    getAllOrders : builder.query({
+      query : (userId) => ({
+        url : `/user/get-orders/${userId}`,
+        method : "GET"
+      }),
+      providesTags : ["order"]
+    }),
+
+    CancleOrder : builder.mutation({
+      query : (orderId) => ({
+        url : "/user/cancle-order",
+        method : "POST",
+        body : {orderId}
+      }),
+      invalidatesTags : ["order"]
+    }),
+
+    GetNewProducts : builder.query({
+      query : () => ({
+        url : "/user/get-new-products",
+        method : "GET"
+      })
     })
   }),
 });
@@ -140,5 +164,8 @@ export const {
   useGetReviewQuery,
   useGetAllAddressQuery,
   useAddAddressMutation,
-  useVerifyCuponMutation
+  useVerifyCuponMutation,
+  useGetAllOrdersQuery,
+  useCancleOrderMutation,
+  useGetNewProductsQuery
 } = apiSlice;

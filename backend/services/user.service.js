@@ -8,6 +8,7 @@ import UserAddress from "../models/useraddress.model.js";
 import Review from "../models/review.model.js";
 import validator from "validator";
 import Cupon from "../models/cupon.model.js";
+import Orders from "../models/order.model.js";
 
 export const createUser = async (data) => {
   if (!data.email || !data.password || !data.name || !data.phone) {
@@ -153,7 +154,7 @@ export const CreateReview = async (user, ProductId, Rating, Description) => {
     { new: true }
   );
 
-  console.log(product);
+  // console.log(product);
 
   if (!product) {
     throw new Error("Product not found");
@@ -178,11 +179,65 @@ export const verifyCupon = async (code) => {
     throw new Error("COde Not Found");
   }
 
-  const cupon = await Cupon.find({ code : code });
+  const cupon = await Cupon.find({ code: code });
 
   if (!cupon) {
     throw new Error("Cupon Not Found");
   }
 
   return cupon;
+};
+
+export const removecartItems = async ({ userId }) => {
+  // console.log(userId);
+
+  if (!userId) {
+    throw new Error("userId Not Found");
+  }
+
+  const cart = await Cart.findOneAndDelete({ user: userId });
+
+  return cart;
+};
+
+export const getAllOrders = async (userId) => {
+  if (!userId) {
+    throw new Error("userId Not Found");
+  }
+
+  const orders = await Orders.find({ User: userId })
+    .populate("User")
+    .populate("Address")
+    .populate("Products.product"); // ✔️ सही field name
+
+  if (!orders) {
+    throw new Error("Orders Not Found");
+  }
+
+  return orders;
+};
+
+export const cancleOrder = async (orderId) => {
+  if (!orderId) {
+    throw new Error("orderId Not Found");
+  }
+
+  const orders = await Orders.findByIdAndUpdate(orderId, { isCancel: true });
+
+  if (!orders) {
+    throw new Error("order not found");
+  }
+};
+
+export const getnewProducts = async () => {
+  const products = await Product.find()
+    .sort({ createdAt: -1 })
+    .limit(10)
+    .lean();
+
+  if (!products) {
+    throw new Error("products Not found");
+  }
+
+  return products;
 };
