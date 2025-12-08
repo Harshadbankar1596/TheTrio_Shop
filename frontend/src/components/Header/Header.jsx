@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
 import { useGetBannerBynameQuery } from "../../redux/Admin/userAPI";
-import { ShirtViewer } from "../3D/ShirtViewer";
 
 function MagneticButton({ children, onClick, variant = "solid" }) {
   const wrapperRef = useRef(null);
