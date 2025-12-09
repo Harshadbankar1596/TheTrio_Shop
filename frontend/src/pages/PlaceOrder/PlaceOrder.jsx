@@ -172,6 +172,7 @@ const PlaceOrder = () => {
 
       new window.Razorpay(options).open();
     } catch (error) {
+      setLoading(false)
       console.log(error);
       toast.error("Payment failed");
     }

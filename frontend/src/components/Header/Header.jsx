@@ -2,75 +2,21 @@ import { motion } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
 import { useGetBannerBynameQuery } from "../../redux/Admin/userAPI";
 
-function MagneticButton({ children, onClick, variant = "solid" }) {
-  const wrapperRef = useRef(null);
-  const innerRef = useRef(null);
-
-  function handleMove(e) {
-    if (!wrapperRef.current || !innerRef.current) return;
-
-    const rect = wrapperRef.current.getBoundingClientRect();
-    const x = e.clientX - (rect.left + rect.width / 2);
-    const y = e.clientY - (rect.top + rect.height / 2);
-
-    innerRef.current.style.transform = `translate(${x * 0.15}px, ${
-      y * 0.15
-    }px)`;
-  }
-
-  function handleLeave() {
-    if (!innerRef.current) return;
-    innerRef.current.style.transform = "translate(0px, 0px)";
-  }
-
-  const isGhost = variant === "ghost";
-
-  return (
-    <motion.button
-      ref={wrapperRef}
-      onMouseMove={handleMove}
-      onMouseLeave={handleLeave}
-      onClick={onClick}
-      whileHover={{ scale: 1.06 }}
-      whileTap={{ scale: 0.97 }}
-      transition={{ type: "spring", stiffness: 180, damping: 16 }}
-      className={`relative overflow-hidden inline-flex items-center px-7 py-3 rounded-full font-semibold tracking-wide select-none
-        ${
-          isGhost
-            ? "bg-white/10 border border-white/20 text-white backdrop-blur-xl"
-            : "bg-white text-black shadow-[0_10px_35px_rgba(255,255,255,0.25)]"
-        }`}
-    >
-      <span
-        ref={innerRef}
-        className="relative z-20 flex items-center gap-2 transition-transform duration-150"
-      >
-        {children}
-      </span>
-
-      <span
-        className="absolute left-0 top-0 bottom-0 w-[3px] bg-indigo-400/90"
-        style={{ boxShadow: "0 0 10px rgba(99,102,241,0.8)" }}
-      />
-    </motion.button>
-  );
-}
-
 const Header = ({ setCategory = () => {} }) => {
   const ref = useRef(null);
-  const { data : homepage} = useGetBannerBynameQuery("home");
+  const { data: homepage } = useGetBannerBynameQuery("home");
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  useEffect(() => {
-    function handleMove(e) {
-      const x = (e.clientX / window.innerWidth - 0.5) * 2;
-      const y = (e.clientY / window.innerHeight - 0.5) * 2;
-      setMousePos({ x, y });
-    }
+  // useEffect(() => {
+  //   function handleMove(e) {
+  //     const x = (e.clientX / window.innerWidth - 0.5) * 2;
+  //     const y = (e.clientY / window.innerHeight - 0.5) * 2;
+  //     setMousePos({ x, y });
+  //   }
 
-    window.addEventListener("mousemove", handleMove);
-    return () => window.removeEventListener("mousemove", handleMove);
-  }, []);
+  //   window.addEventListener("mousemove", handleMove);
+  //   return () => window.removeEventListener("mousemove", handleMove);
+  // }, []);
 
   useEffect(() => {
     function onScroll() {
@@ -93,15 +39,15 @@ const Header = ({ setCategory = () => {} }) => {
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
       {/* FLEX: LEFT TEXT + RIGHT 3D MODEL */}
-      <div className="container mx-auto px-6 md:px-12 h-full flex items-center justify-between gap-8">
+      <div className="container mx-auto px-6 md:px-12 h-full flex flex-col md:flex-row items-center justify-between gap-8">
         {/* LEFT TEXT */}
         <motion.div
           className="relative max-w-2xl"
-          animate={{
-            x: mousePos.x * 15,
-            y: mousePos.y * 15,
-          }}
-          transition={{ type: "spring", stiffness: 70, damping: 20 }}
+          // animate={{
+          //   x: mousePos.x * 15,
+          //   y: mousePos.y * 15,
+          // }}
+          // transition={{ type: "spring", stiffness: 70, damping: 20 }}
         >
           <motion.h1
             initial={{ opacity: 0, y: 40 }}
@@ -142,22 +88,22 @@ const Header = ({ setCategory = () => {} }) => {
             transition={{ duration: 1, delay: 0.3 }}
             className="mt-8 flex gap-4"
           >
-            <MagneticButton onClick={() => setCategory("Shirts")}>
-              Shop Shirts
-            </MagneticButton>
+            {/* <button>Shop Shirts</button>
 
-            <MagneticButton
-              variant="ghost"
-              onClick={() => setCategory("Pants")}
-            >
-              Shop Pants
-            </MagneticButton>
+            <button>Shop Pants</button> */}
           </motion.div>
         </motion.div>
         <Hover3DWrapper>
           {/* <ShirtViewer /> */}
-          <div className="w-full h-full flex justify-center object-contain">
-            <img src="us.png" alt="" />
+          <div className="h-5/6 flex justify-center items-center">
+            <img
+              src="/uss.png"
+              alt=""
+              className="w-full h-full object-contain transition duration-300 hover:scale-125"
+              style={{
+                filter: "drop-shadow(0 16px 20px rgba(0,0,0,0.4))",
+              }}
+            />
           </div>
         </Hover3DWrapper>
       </div>
