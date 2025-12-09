@@ -1,6 +1,10 @@
-import React from "react";
+import {useEffect} from "react";
 
 const PrivacyPolicy = () => {
+  useEffect(() => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}, []);
+
   return (
     <div className="w-full flex items-center justify-center">
         <div className="text-white flex flex-col w-8/12">

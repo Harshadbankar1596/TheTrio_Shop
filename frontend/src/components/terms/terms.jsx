@@ -1,6 +1,10 @@
-import React from "react";
+import {useEffect} from "react";
 
 const TermsOfService = () => {
+  useEffect(() => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}, []);
+
   return (
     <div className="text-white w-full flex items-center justify-center">
         <div className="w-2/3">

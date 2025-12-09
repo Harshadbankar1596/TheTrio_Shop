@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect } from "react";
 import {
   useGetAllOrdersQuery,
   useCancleOrderMutation,
@@ -26,13 +26,17 @@ const MyOrders = () => {
   const user = useSelector((state) => state.user);
   const { data: orders, isLoading } = useGetAllOrdersQuery(user.id);
   console.log(orders);
-  
+
   const [cancleorder, { isLoading: loadingcancle }] = useCancleOrderMutation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [orders]);
 
   async function CancleOrder(orderId) {
     try {
       console.log(orderId);
-      
+
       const res = await cancleorder(orderId);
       if (res.error) {
         toast.error("Error in Cancle order");
@@ -197,7 +201,10 @@ const MyOrders = () => {
                   Cancelled
                 </button>
               ) : order.DeliveryStatus !== "Delivered" ? (
-                <button onClick={()=> CancleOrder(order._id)} className="px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 text-sm">
+                <button
+                  onClick={() => CancleOrder(order._id)}
+                  className="px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 text-sm"
+                >
                   Cancel Order
                 </button>
               ) : (

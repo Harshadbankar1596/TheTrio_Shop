@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import Header from "../../components/Header/Header";
 import ExploreMenu from "../../components/ExploreMenu/ExploreMenu";
 import NewProducts from "../../components/newproducts/NewProducts"
 const Home = () => {
   const [category, setCategory] = useState("All");
+useEffect(() => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}, []);
 
   return (
     <div className="w-full min-h-screen bg-black text-white overflow-x-hidden">

@@ -50,6 +50,11 @@ const PlaceOrder = () => {
     }
   }, [data]);
 
+  useEffect(() => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}, []);
+
+
   // APPLY COUPON HANDLER
   const applyCoupon = async () => {
     console.log(couponCode);

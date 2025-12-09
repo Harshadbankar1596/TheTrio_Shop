@@ -1,6 +1,10 @@
-import React from "react";
+import { useEffect } from "react";
 
 const ContactUs = () => {
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   return (
     <div className="text-white flex flex-col items-center justify-center p-10">
       <h2>Contact Us</h2>

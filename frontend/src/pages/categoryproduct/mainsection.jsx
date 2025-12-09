@@ -34,7 +34,7 @@
 //     );
 // }
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Filter, Menu, X } from "lucide-react";
 import FilterSidebar from "./filtersidebar";
 import Products from "./products";
@@ -47,6 +47,9 @@ export default function MainSection() {
   const products = data?.data || [];
   const [filters, setFilters] = useState(null);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   return (
     <div className="min-h-screen bg-black">

@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo , useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { ShoppingBag, Trash2, MapPin, Loader } from "lucide-react";
@@ -29,6 +29,12 @@ export default function TheTrioCart() {
     size: x.size,
     _id: x._id,
   }));
+
+
+  useEffect(() => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}, []);
+
 
   // 🔴 CHECK FOR INACTIVE PRODUCTS
   const hasInactive = items.some(x => x.product?.isActive === false);
