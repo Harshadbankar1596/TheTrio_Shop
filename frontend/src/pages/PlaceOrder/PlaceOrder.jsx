@@ -40,6 +40,7 @@ const PlaceOrder = () => {
 
   // ALWAYS calculate fresh values (BEST PRACTICE)
   const items = state?.items || [];
+
   const delivery = 40;
 
   const subtotal = items.reduce(
@@ -48,6 +49,7 @@ const PlaceOrder = () => {
   );
 
   const total = subtotal + delivery;
+  console.log(total);
 
   // ADDRESS FETCH
   const { data } = useGetAllAddressQuery({ userId: user.id });
@@ -77,7 +79,7 @@ const PlaceOrder = () => {
       return toast.error("Invalid or expired coupon");
     }
 
-    const coupon = res.data?.cupon?.[0];
+    const coupon = res.data?.cupon;
 
     if (!coupon) {
       setVerifiedCoupon(null);
@@ -150,15 +152,17 @@ const PlaceOrder = () => {
           subtotal,
           delivery,
           total: finalTotal,
-          cuponCode: verifiedCoupon.code || null,
+          cuponCode: verifiedCoupon?.code || null,
         }
       );
 
       const order = data.order;
+      console.log(order);
+
       setLoading(false);
       const options = {
         key: "rzp_test_Rn8IK6gWbfPl97",
-        amount: order.amount * 100,
+        amount: order.amount,
         currency: "INR",
         name: "The Trio Shop",
         description: "Order Payment",
@@ -177,7 +181,7 @@ const PlaceOrder = () => {
               paymenttype: "razorpay",
               Products: items,
               User: user,
-              TotalAmount: finalTotal,
+              TotalAmount: finalTotal.toFixed(2),
               TotalDiscount: totalDiscount,
               Address: selectedAddress,
               couponCode: verifiedCoupon?.code || null,

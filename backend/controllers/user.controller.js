@@ -366,6 +366,8 @@ const userController = {
 
   CheckOutPayment: async (req, res) => {
     try {
+      console.log(req.body);
+      
       const { products, userId, userAddressId, cuponCode } = req.body;
 
       if (!products || !userId || !userAddressId) {
@@ -398,8 +400,9 @@ const userController = {
         }
 
         amountInPaise += product.finalPrice * item.quantity * 100;
+        
       }
-
+      
       // APPLY COUPON
       if (couponDiscountPercent > 0) {
         const discountValue = Math.round(
@@ -437,7 +440,6 @@ const userController = {
   },
 
   VerifyPayment: async (req, res) => {
-    // console.log(req.body);
 
     try {
       const {
