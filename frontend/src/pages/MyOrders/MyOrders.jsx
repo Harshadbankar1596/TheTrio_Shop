@@ -13,6 +13,7 @@ const statusColors = {
   Delivered: "bg-green-600",
   Cancelled: "bg-red-600",
 };
+import Shimmer from "./ShimmerOfOrders";
 
 const trackingSteps = [
   "Placed",
@@ -24,13 +25,14 @@ const trackingSteps = [
 
 const MyOrders = () => {
   const user = useSelector((state) => state.user);
-  const { data: orders, isLoading } = useGetAllOrdersQuery(user.id);
+  const { data: orders, isLoading , refetch} = useGetAllOrdersQuery(user.id);
   console.log(orders);
 
   const [cancleorder, { isLoading: loadingcancle }] = useCancleOrderMutation();
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+    refetch()
   }, [orders]);
 
   async function CancleOrder(orderId) {
@@ -47,6 +49,10 @@ const MyOrders = () => {
       toast.error("Error in Cancle order");
       console.log(error);
     }
+  }
+
+  if (isLoading) {
+    return <Shimmer />;
   }
 
   return (

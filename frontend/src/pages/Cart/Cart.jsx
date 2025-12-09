@@ -9,6 +9,7 @@ import {
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { useState } from "react";
+import Shimmer from "./ShimmerOfCart"
 
 export default function TheTrioCart() {
   const user = useSelector((state) => state.user);
@@ -80,7 +81,7 @@ export default function TheTrioCart() {
   }
 
   if (isLoading)
-    return <div className="text-center mt-20 text-white">Loading cart...</div>;
+    return <Shimmer />;
 
   return (
     <div className="w-full px-6 md:px-16 mt-16 text-white">

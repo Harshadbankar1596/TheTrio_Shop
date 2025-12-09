@@ -18,7 +18,7 @@ import {
   removecartItems,
   getAllOrders,
   cancleOrder,
-  getnewProducts
+  getnewProducts,
 } from "../services/user.service.js";
 import generateToken from "../utils/generateJWT.js";
 
@@ -280,22 +280,115 @@ const userController = {
     }
   },
 
+  // CheckOutPayment: async (req, res) => {
+  //   try {
+  //     const { products, userId, userAddressId, cuponCode, total, subtotal } =
+  //       req.body;
+  //     if (!products || !userId || !userAddressId) {
+  //       return res.status(404).json({ message: "All Fields Are Required" });
+  //     }
+
+  //     const user = await User.findById(userId).lean();
+  //     if (!user) {
+  //       return res.status(400).json({ message: "User Not Found" });
+  //     }
+  //     const address = await UserAddress.findById(userAddressId).lean();
+  //     if (!address) {
+  //       return res.status(400).json({ message: "Address not found" });
+  //     }
+  //     let cuponCodeDiscount = 0;
+  //     if (cuponCode) {
+  //       const cupon = await verifyCupon(cuponCode);
+  //       cuponCodeDiscount = cupon.discount;
+  //     }
+
+  //     // let amountInPaise = 0;
+
+  //     // for (let item of products) {
+  //     //   const product = await Product.findById(item.productId);
+  //     //   if (!product) {
+  //     //     return res.status(404).json({ message: "Product not found" });
+  //     //   }
+
+  //     //   const total = product.finalPrice * item.quantity;
+  //     //   amountInPaise += total * 100;
+  //     // }
+
+  //     // if (amountInPaise < 100) {
+  //     //   return res.status(400).json({
+  //     //     message: "Total amount must be at least Rs.1",
+  //     //   });
+  //     // }
+
+  //     // let amountInPaise = 0;
+
+  //     // product calculation
+  //     for (let item of products) {
+  //       const product = await Product.findById(item.productId);
+  //       amountInPaise += product.finalPrice * item.quantity * 100;
+  //     }
+
+  //     // apply coupon discount
+  //     if (cuponCodeDiscount > 0) {
+  //       const discountValue = Math.round(
+  //         (amountInPaise * cuponCodeDiscount) / 100
+  //       );
+  //       amountInPaise -= discountValue;
+  //     }
+
+  //     // delivery
+  //     amountInPaise += 40 * 100;
+
+  //     // validation
+  //     if (amountInPaise < 100) {
+  //       return res.status(400).json({
+  //         message: "Total amount must be at least Rs.1",
+  //       });
+  //     }
+
+  //     // delavery charjess
+  //     amountInPaise += 40 * 100;
+
+  //     const options = {
+  //       amount: amountInPaise,
+  //       currency: "INR",
+  //       notes: { products, user, address },
+  //     };
+
+  //     const order = await instance.orders.create(options);
+
+  //     res.status(200).json({
+  //       message: "Order created successfully",
+  //       order,
+  //     });
+  //   } catch (error) {}
+  // },
+
   CheckOutPayment: async (req, res) => {
     try {
-      const { products, userId, userAddressId } = req.body;
+      const { products, userId, userAddressId, cuponCode } = req.body;
+
       if (!products || !userId || !userAddressId) {
         return res.status(404).json({ message: "All Fields Are Required" });
       }
 
+      // USER
       const user = await User.findById(userId).lean();
-      if (!user) {
-        return res.status(400).json({ message: "User Not Found" });
-      }
+      if (!user) return res.status(400).json({ message: "User Not Found" });
+
+      // ADDRESS
       const address = await UserAddress.findById(userAddressId).lean();
-      if (!address) {
+      if (!address)
         return res.status(400).json({ message: "Address not found" });
+
+      // COUPON
+      let couponDiscountPercent = 0;
+      if (cuponCode) {
+        const coupon = await verifyCupon(cuponCode);
+        couponDiscountPercent = coupon.discount || 0;
       }
 
+      // PRODUCT TOTAL PRICE
       let amountInPaise = 0;
 
       for (let item of products) {
@@ -304,18 +397,28 @@ const userController = {
           return res.status(404).json({ message: "Product not found" });
         }
 
-        const total = product.finalPrice * item.quantity;
-        amountInPaise += total * 100;
+        amountInPaise += product.finalPrice * item.quantity * 100;
       }
 
+      // APPLY COUPON
+      if (couponDiscountPercent > 0) {
+        const discountValue = Math.round(
+          (amountInPaise * couponDiscountPercent) / 100
+        );
+        amountInPaise -= discountValue;
+      }
+
+      // ADD DELIVERY ONCE (40 rupees)
+      amountInPaise += 40 * 100;
+
+      // VALIDATION
       if (amountInPaise < 100) {
         return res.status(400).json({
           message: "Total amount must be at least Rs.1",
         });
       }
-      // delavery charjess
-      amountInPaise += 40 * 100;
 
+      // RAZORPAY ORDER
       const options = {
         amount: amountInPaise,
         currency: "INR",
@@ -328,7 +431,9 @@ const userController = {
         message: "Order created successfully",
         order,
       });
-    } catch (error) {}
+    } catch (error) {
+      res.status(500).json({ message: "Server Error", error });
+    }
   },
 
   VerifyPayment: async (req, res) => {
@@ -436,29 +541,29 @@ const userController = {
       res.status(200).json({ message: "Success", Orders: orders });
     } catch (error) {
       console.log(error);
-      
+
       res.status(500).json({ message: "Server Error" });
     }
   },
 
-  CancleOrder : async (req , res) => {
+  CancleOrder: async (req, res) => {
     try {
-      const order = await cancleOrder(req.body.orderId)
-      res.status(200).json({message : "Succsess" , Order : order})
+      const order = await cancleOrder(req.body.orderId);
+      res.status(200).json({ message: "Succsess", Order: order });
     } catch (error) {
       console.log(error);
-      
-      res.status(500).json({message : "Server Error"})
+
+      res.status(500).json({ message: "Server Error" });
     }
   },
 
-  GetNewProducts : async (req , res) => {
+  GetNewProducts: async (req, res) => {
     try {
-      const products = await getnewProducts()
-      res.status(200).json({message : "Success" , products})
+      const products = await getnewProducts();
+      res.status(200).json({ message: "Success", products });
     } catch (error) {
-      res.status(500).json({message : "Server Error"})
+      res.status(500).json({ message: "Server Error" });
     }
-  }
+  },
 };
 export default userController;

@@ -179,7 +179,7 @@ export const verifyCupon = async (code) => {
     throw new Error("COde Not Found");
   }
 
-  const cupon = await Cupon.find({ code: code });
+  const cupon = await Cupon.findOne({ code: code });
 
   if (!cupon) {
     throw new Error("Cupon Not Found");
@@ -208,7 +208,8 @@ export const getAllOrders = async (userId) => {
   const orders = await Orders.find({ User: userId })
     .populate("User")
     .populate("Address")
-    .populate("Products.product"); // ✔️ सही field name
+    .populate("Products.product")
+    .sort({ _id: -1 }); // ✔️ सही field name
 
   if (!orders) {
     throw new Error("Orders Not Found");

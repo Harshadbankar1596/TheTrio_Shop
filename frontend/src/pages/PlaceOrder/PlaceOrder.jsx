@@ -27,18 +27,27 @@ const PlaceOrder = () => {
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("razorpay");
 
-  let { items, subtotal, total, delivery, totalDiscount } = state || {};
-  // console.log(totalDiscount);
+  // let { items, subtotal, total, delivery, totalDiscount } = state || {};
 
-  // PRICE CALCULATION
-  if (items?.length && (!subtotal || !total)) {
-    subtotal = items.reduce(
-      (sum, x) => sum + x.product.finalPrice * x.quantity,
-      0
-    );
-    delivery = delivery ?? 40;
-    total = subtotal + delivery;
-  }
+  // if (items?.length && (!subtotal || !total)) {
+  //   subtotal = items.reduce(
+  //     (sum, x) => sum + x.product.finalPrice * x.quantity,
+  //     0
+  //   );
+  //   delivery = delivery ?? 40;
+  //   total = subtotal + delivery;
+  // }
+
+  // ALWAYS calculate fresh values (BEST PRACTICE)
+  const items = state?.items || [];
+  const delivery = 40;
+
+  const subtotal = items.reduce(
+    (sum, x) => sum + x.product.finalPrice * x.quantity,
+    0
+  );
+
+  const total = subtotal + delivery;
 
   // ADDRESS FETCH
   const { data } = useGetAllAddressQuery({ userId: user.id });
@@ -51,9 +60,8 @@ const PlaceOrder = () => {
   }, [data]);
 
   useEffect(() => {
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}, []);
-
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   // APPLY COUPON HANDLER
   const applyCoupon = async () => {
@@ -80,7 +88,9 @@ const PlaceOrder = () => {
     setVerifiedCoupon(coupon);
 
     // Calculate discount amount
-    const discount = Math.floor((subtotal * coupon.discount) / 100);
+    // const discount = Math.floor((subtotal * coupon.discount) / 100);
+    const discount = Math.round((subtotal * coupon.discount) / 100);
+
     setDiscountAmount(discount);
 
     toast.success(`Coupon Applied! You saved ₹${discount}`);
@@ -110,7 +120,6 @@ const PlaceOrder = () => {
       toast.success("Order Placed (Cash on Delivery)");
       navigate("/success", {
         state: {
-          // orderId: "COD-" + new Date().getTime(),
           paymenttype: "COD",
           Products: items,
           User: user,
@@ -141,6 +150,7 @@ const PlaceOrder = () => {
           subtotal,
           delivery,
           total: finalTotal,
+          cuponCode: verifiedCoupon.code || null,
         }
       );
 
@@ -178,7 +188,7 @@ const PlaceOrder = () => {
 
       new window.Razorpay(options).open();
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       console.log(error);
       toast.error("Payment failed");
     }
