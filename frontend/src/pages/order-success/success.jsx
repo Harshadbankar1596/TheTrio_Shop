@@ -16,7 +16,7 @@ const Success = () => {
     async function verifyOrder() {
       try {
         const res = await axios.post(
-          "http://localhost:5000/api/user/verify-payment",
+         `${import.meta.env.VITE_BACKEND_URL}/user/verify-payment`,
           {
             razorpay_order_id: obj.orderId,
             razorpay_payment_id: obj.paymentId,

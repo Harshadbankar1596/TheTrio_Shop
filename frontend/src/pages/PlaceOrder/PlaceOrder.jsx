@@ -129,7 +129,8 @@ const PlaceOrder = () => {
     try {
       setLoading(true);
       const { data } = await axios.post(
-        "http://localhost:5000/api/user/checkoutpayment",
+        // "http://localhost:5000/api/user/checkoutpayment",
+        `${import.meta.env.VITE_BACKEND_URL}/user/checkoutpayment`,
         {
           userId: user.id,
           products: items.map((x) => ({
