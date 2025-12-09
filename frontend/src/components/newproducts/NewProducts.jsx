@@ -1,13 +1,13 @@
 import React from "react";
 import { useGetNewProductsQuery } from "../../redux/Admin/userAPI";
 import { Link } from "react-router-dom";
-
+import Shimmer from "./ShimmerOfProducts"
 const NewProducts = () => {
   const { data, isLoading } = useGetNewProductsQuery();
 
   if (isLoading)
     return (
-      <div className="text-white text-center py-10 text-xl">Loading...</div>
+      <Shimmer />
     );
 
   const products = data?.products || [];

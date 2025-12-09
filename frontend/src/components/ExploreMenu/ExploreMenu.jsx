@@ -2,11 +2,16 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useGetCategoryQuery } from "../../redux/Admin/userAPI";
 import { Link } from "react-router-dom";
+import Shimmer from "./ShimmerOfMenu"
 const ExploreMenu = ({ category, setCategory }) => {
   const { data: apiCategories, isLoading } = useGetCategoryQuery();
 
   // FIX: backend returns { success: true, data: [...] }
   const categories = apiCategories?.data || [];
+
+  if(isLoading){
+    return <Shimmer />
+  }
 
   return (
     <div
