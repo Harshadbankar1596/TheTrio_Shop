@@ -8,18 +8,21 @@ import {
     getSubCategoriesByCategoryId,
     createBanner
 } from "../services/admin.service.js";
+import fs from "fs"
 
 const adminController = {
 
     addCategory: async (req, res) => {
         try {
-            const category = await createCategory(req.body);
+            const category = await createCategory(req.body , req.file.path);
+            //  fs.unlinkSync(req.file.path);
             return res.status(201).json({
                 success: true,
                 message: "Category added successfully",
                 data: category
             });
         } catch (error) {
+            // fs.unlinkSync(req.file.path);
             return res.status(400).json({
                 success: false,
                 message: error.message || "Failed to add category"
@@ -29,7 +32,7 @@ const adminController = {
 
     addSubCategory: async (req, res) => {
         try {
-            const subCategory = await createSubCategory(req.body);
+            const subCategory = await createSubCategory(req.body , req.file.path);
             return res.status(201).json({
                 success: true,
                 message: "Subcategory added successfully",
@@ -77,13 +80,16 @@ const adminController = {
 
     addNewProduct: async (req, res) => {
         try {
-            const product = await addProduct(req.body);
+              
+            const product = await addProduct(req.body , req.files);
             return res.status(201).json({
                 success: true,
                 message: "Product added successfully",
                 data: product
             });
         } catch (error) {
+            console.log(error);
+            
             return res.status(400).json({
                 success: false,
                 message: error.message || "Failed to add product"
