@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Name from "../Name"; // Your Brand Component (Keep it)
-
+import { Link } from "react-router-dom";
 const Footer = () => {
   return (
     <div
@@ -71,16 +71,23 @@ const Footer = () => {
             Company
           </h2>
 
-          <ul className="space-y-3 text-white/60">
-            {["Home", "About Us", "Collections", "Privacy Policy"].map(
+          <ul className="space-y-3 text-white/60 flex flex-col">
+            {["Home", "contact", "privacypolicy", "termcondition" , "refundpolicy"].map(
               (item, i) => (
-                <motion.li
+                <Link
                   key={i}
-                  whileHover={{ scale: 1.05, x: 5 }}
+                  to={`/${item === "Home" ? "" : item}`}
                   className="cursor-pointer hover:text-white transition-all"
                 >
                   {item}
-                </motion.li>
+                </Link>
+                // <motion.div
+                //   key={i}
+                //   whileHover={{ scale: 1.05, x: 5 }}
+                //   className="cursor-pointer hover:text-white transition-all"
+                // >
+                //   {item}
+                // </motion.div>
               )
             )}
           </ul>
@@ -93,10 +100,7 @@ const Footer = () => {
           </h2>
 
           <ul className="space-y-3 text-white/60">
-            <motion.li
-              whileHover={{ scale: 1.05 }}
-              className="cursor-pointer"
-            >
+            <motion.li whileHover={{ scale: 1.05 }} className="cursor-pointer">
               +91 7028445707
             </motion.li>
 

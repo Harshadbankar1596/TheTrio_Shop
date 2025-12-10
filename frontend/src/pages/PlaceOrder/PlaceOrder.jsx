@@ -128,7 +128,7 @@ const PlaceOrder = () => {
           TotalAmount: finalTotal,
           TotalDiscount: totalDiscount,
           Address: selectedAddress,
-          couponCode: verifiedCoupon || null,
+          cuponCode: verifiedCoupon?.code || null,
         },
       });
       return;
@@ -197,6 +197,8 @@ const PlaceOrder = () => {
       toast.error("Payment failed");
     }
   };
+
+  console.log(paymentMethod);
 
   return (
     <div className="min-h-screen bg-[#0d0e10] text-white p-6 md:p-10">

@@ -4,7 +4,14 @@ import { toast } from "react-toastify";
 import axios from "axios";
 
 // Lucide Icons
-import { CheckCircle, Calendar, CreditCard, User, MapPin, Tag } from "lucide-react";
+import {
+  CheckCircle,
+  Calendar,
+  CreditCard,
+  User,
+  MapPin,
+  Tag,
+} from "lucide-react";
 
 import successGif from "../../../public/success.gif"; // <-- your success animation
 
@@ -16,16 +23,17 @@ const Success = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  // SEND ORDER TO BACKEND
   useEffect(() => {
     async function verifyOrder() {
+      console.log(obj);
+
       try {
         const res = await axios.post(
           `${import.meta.env.VITE_BACKEND_URL}/user/verify-payment`,
           {
-            razorpay_order_id: obj.orderId,
-            razorpay_payment_id: obj.paymentId,
-            razorpay_signature: obj.signature,
+            razorpay_order_id: obj.orderId || null,
+            razorpay_payment_id: obj.paymentId || null,
+            razorpay_signature: obj.signature || null,
             TotalAmount: obj.TotalAmount,
             TotalDiscount: obj.TotalDiscount,
             userId: obj.User.id,
@@ -46,7 +54,9 @@ const Success = () => {
       }
     }
 
-    if (obj?.orderId) verifyOrder();
+    if (obj?.paymenttype === "COD" || obj?.orderId) {
+      verifyOrder();
+    }
   }, []);
 
   const date = new Date().toDateString();
@@ -54,8 +64,6 @@ const Success = () => {
   return (
     <div className="min-h-screen bg-[#eef2f7] px-4 py-10 flex justify-center text-gray-900">
       <div className="w-full max-w-3xl">
-
-        {/* ✓ SUCCESS ICON + TEXT */}
         <div className="flex flex-col items-center mb-8">
           <img src={successGif} alt="Success" className="w-32 h-32" />
 
@@ -75,15 +83,15 @@ const Success = () => {
           </Link>
         </div>
 
-        {/* PAYMENT SUMMARY CARD */}
-        <div className="
+        <div
+          className="
           bg-white 
           shadow-xl 
           rounded-3xl 
           p-6 
           border border-gray-200
-        ">
-          {/* HEADER */}
+        "
+        >
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-xl font-semibold text-indigo-600 flex items-center gap-1">
@@ -97,16 +105,12 @@ const Success = () => {
             </span>
           </div>
 
-          {/*  DETAILS GRID */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
-
-            {/* Transaction ID */}
             <div>
               <p className="text-xs text-gray-500">Transaction ID</p>
               <p className="font-semibold">{obj.paymentId}</p>
             </div>
 
-            {/* Invoice */}
             <div>
               <p className="text-xs text-gray-500">Payment Method</p>
               <p className="font-semibold capitalize flex items-center gap-2">
@@ -114,7 +118,6 @@ const Success = () => {
               </p>
             </div>
 
-            {/* Date */}
             <div>
               <p className="text-xs text-gray-500">Date</p>
               <p className="font-semibold flex items-center gap-2">
@@ -122,7 +125,6 @@ const Success = () => {
               </p>
             </div>
 
-            {/* User */}
             <div>
               <p className="text-xs text-gray-500">Customer</p>
               <p className="font-semibold flex items-center gap-2">
@@ -131,22 +133,23 @@ const Success = () => {
             </div>
           </div>
 
-          {/* ADDRESS */}
           <div className="mt-6">
             <p className="text-xs text-gray-500 mb-1">Delivery Address</p>
             <div className="flex items-start gap-2 text-sm">
               <MapPin size={18} className="text-red-500 mt-1" />
               <p className="font-medium">
                 {obj.Address?.addressLine1}, {obj.Address?.addressLine2},<br />
-                {obj.Address?.city}, {obj.Address?.state} - {obj.Address?.postalCode}
+                {obj.Address?.city}, {obj.Address?.state} -{" "}
+                {obj.Address?.postalCode}
               </p>
             </div>
           </div>
 
-          {/* TOTAL */}
           <div className="mt-6 pt-4 border-t border-gray-200 flex justify-between">
             <p className="font-semibold">Total Paid</p>
-            <p className="font-bold text-green-600 text-lg">₹{obj.TotalAmount}</p>
+            <p className="font-bold text-green-600 text-lg">
+              ₹{obj.TotalAmount}
+            </p>
           </div>
         </div>
       </div>

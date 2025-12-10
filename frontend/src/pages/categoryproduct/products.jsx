@@ -116,26 +116,21 @@ export default function Products({ products = [], loading, appliedFilters }) {
               <div
                 className="
         relative
-        bg-[#121212]
-        border border-[#1E1E1E]
         hover:border-[#2a2a2a]
-        rounded-2xl
         p-5
         transition-all duration-300
         h-full flex flex-col
       "
               >
-                {/* SALE BADGE (TOP LEFT) */}
                 {item.discount > 0 && (
                   <span
                     className="
             absolute top-4 left-4
-            bg-[#E7F158]
+            bg-green-500
             text-black 
             text-[11px] 
             font-bold 
             px-3 py-[5px] 
-            rounded-full 
           "
                   >
                     Sale {item.discount}%
@@ -146,8 +141,7 @@ export default function Products({ products = [], loading, appliedFilters }) {
                 <div
                   className="
           w-full 
-          h-64 
-          rounded-xl 
+          h-96 
           overflow-hidden 
           bg-[#1a1a1a]
           flex justify-center items-center
@@ -157,7 +151,7 @@ export default function Products({ products = [], loading, appliedFilters }) {
                     src={item.images[0]}
                     alt={item.title}
                     className="w-full h-full object-cover"
-                    whileHover={{ scale: 1.03 }}
+                    // whileHover={{ scale: 1.03 }}
                     transition={{ duration: 0.3 }}
                   />
                 </div>
