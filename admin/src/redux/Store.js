@@ -2,9 +2,7 @@ import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
-import { apiSlice } from "./Admin/userAPI";
 import { adminApiSlice } from "./Admin/adminAPI";
-import userReducer from "./Admin/userSlice";
 import adminReducer from "./Admin/adminSlice";
 
 import {
@@ -16,18 +14,16 @@ import {
   REGISTER,
 } from "redux-persist";
 
-// Persist user and admin slices
+// Persist admin slice
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["user", "admin"],
+  whitelist: ["admin"],
 };
 
 const rootReducer = combineReducers({
-  user: userReducer,
   admin: adminReducer,
-  [apiSlice.reducerPath]: apiSlice.reducer, // User RTK Query
-  [adminApiSlice.reducerPath]: adminApiSlice.reducer, // Admin RTK Query
+  [adminApiSlice.reducerPath]: adminApiSlice.reducer,
 });
 
 // Persisted root reducer
@@ -42,8 +38,9 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }).concat(apiSlice.middleware, adminApiSlice.middleware),
+    }).concat(adminApiSlice.middleware),
 });
 
 // Persistor
 export const persistor = persistStore(store);
+
