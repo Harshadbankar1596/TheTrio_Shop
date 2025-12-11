@@ -7,7 +7,7 @@ import cors from "cors";
 
 
 const app = express();
-app.use(cors({origin : ["http://localhost:5173" , "https://thetrio-shop-frontend.onrender.com" , "http://localhost:5174"], credentials : true}));
+app.use(cors({origin : ["http://localhost:5173" , "https://thetrio-shop-frontend.onrender.com" , "https://thetrio-shop-1-admin.onrender.com", "http://localhost:5174"], credentials : true}));
 app.use(express.json());
 await connectDB();
 
