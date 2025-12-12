@@ -10,3 +10,4 @@ adminSchema.index({ email: 1 });
 
 export default mongoose.model("Admin", adminSchema);
 
+
