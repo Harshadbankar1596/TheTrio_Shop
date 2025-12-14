@@ -242,3 +242,15 @@ export const getnewProducts = async () => {
 
   return products;
 };
+
+export const ProductQuentyty = async (Products) => {
+  if (!Products) {
+    throw new Error("Products not found");
+  }
+
+  for (const item of Products) {
+    await Product.findByIdAndUpdate(item.product._id, {
+      $inc: { stock: -item.quantity },
+    });
+  }
+};

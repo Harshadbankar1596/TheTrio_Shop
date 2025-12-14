@@ -28,30 +28,9 @@ const PlaceOrder = () => {
   const [paymentMethod, setPaymentMethod] = useState("razorpay");
 
   let { items, subtotal, total, delivery, totalDiscount } = state || {};
+  // console.log("items => " , items);
+  
 
-  // if (items?.length && (!subtotal || !total)) {
-  //   subtotal = items.reduce(
-  //     (sum, x) => sum + x.product.finalPrice * x.quantity,
-  //     0
-  //   );
-  //   delivery = delivery ?? 40;
-  //   total = subtotal + delivery;
-  // }
-
-  // ALWAYS calculate fresh values (BEST PRACTICE)
-  // const items = state?.items || [];
-
-  // const delivery = 40;
-
-  // const subtotal = items.reduce(
-  //   (sum, x) => sum + x.product.finalPrice * x.quantity,
-  //   0
-  // );
-
-  // const total = subtotal + delivery;
-  // console.log(total);
-
-  // ADDRESS FETCH
   const { data } = useGetAllAddressQuery({ userId: user.id });
   const [selectedAddress, setSelectedAddress] = useState(null);
 

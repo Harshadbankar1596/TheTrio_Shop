@@ -19,6 +19,7 @@ import {
   getAllOrders,
   cancleOrder,
   getnewProducts,
+  ProductQuentyty
 } from "../services/user.service.js";
 import generateToken from "../utils/generateJWT.js";
 
@@ -366,7 +367,6 @@ const userController = {
 
   CheckOutPayment: async (req, res) => {
     try {
-      console.log(req.body);
       
       const { products, userId, userAddressId, cuponCode } = req.body;
 
@@ -398,9 +398,10 @@ const userController = {
         if (!product) {
           return res.status(404).json({ message: "Product not found" });
         }
-
+        if(product.stock >= item.quantity){
+          return res.status(404).json({message : "Product Quentyty Is Low"})
+        }
         amountInPaise += product.finalPrice * item.quantity * 100;
-        
       }
       
       // APPLY COUPON
@@ -438,9 +439,9 @@ const userController = {
       res.status(500).json({ message: "Server Error", error });
     }
   },
-
+  
   VerifyPayment: async (req, res) => {
-
+    
     try {
       const {
         razorpay_order_id,
@@ -454,7 +455,10 @@ const userController = {
         PaymentType,
         CuponCode,
       } = req.body;
-
+      
+      // console.log(req.body);
+      
+      
       if (
         !TotalAmount ||
         !TotalDiscount ||
@@ -465,7 +469,8 @@ const userController = {
       ) {
         return res.status(400).json({ message: "All Fields Are Required" });
       }
-
+      
+      const call = await ProductQuentyty(Products)
       const cart = await removecartItems({ userId });
       // console.log("cart =>", cart);
 
@@ -528,6 +533,7 @@ const userController = {
           order,
         });
       }
+
 
       return res.status(400).json({ message: "Invalid Payment Type" });
     } catch (error) {
