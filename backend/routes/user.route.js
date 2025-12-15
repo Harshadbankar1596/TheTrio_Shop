@@ -1,5 +1,6 @@
 import express from "express";
 import userController from "../controllers/user.controller.js";
+import {authMiddleware} from "../middleware/auth.middleware.js"
 
 const router = express.Router();
 
@@ -12,11 +13,11 @@ router.get(
   userController.getProductBycategory
 );
 router.get("/product/:productId", userController.getproductById);
-router.post("/cart/add", userController.addcartitem);
-router.get("/cart/:userId", userController.getCartItems);
-router.post("/add-address", userController.addAddress);
+router.post("/cart/add", authMiddleware ,  userController.addcartitem);
+router.get("/cart/:userId",  userController.getCartItems);
+router.post("/add-address", authMiddleware ,  userController.addAddress);
 router.get("/get-alladdress/:userId", userController.getAllAddress);
-router.put("/remove-cartitem", userController.removeCart);
+router.put("/remove-cartitem", authMiddleware , userController.removeCart);
 router.post("/create-review", userController.createReview);
 router.get("/get-product-review/:ProductId", userController.getReview);
 router.post("/checkoutpayment", userController.CheckOutPayment);
