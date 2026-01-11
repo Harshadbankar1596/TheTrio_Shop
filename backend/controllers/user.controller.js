@@ -398,9 +398,9 @@ const userController = {
         if (!product) {
           return res.status(404).json({ message: "Product not found" });
         }
-        if(product.stock >= item.quantity){
-          return res.status(404).json({message : "Product Quentyty Is Low"})
-        }
+        // if(product.stock >= item.quantity){
+        //   return res.status(404).json({message : "Product Quentyty Is Low"})
+        // }
         amountInPaise += product.finalPrice * item.quantity * 100;
       }
       

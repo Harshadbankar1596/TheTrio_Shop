@@ -10,6 +10,13 @@ import {
 import AddAddressModal from "./addaddress";
 import { CreditCard, Truck, Loader2 } from "lucide-react";
 
+const playSuccessSound = () => {
+  const audio = new Audio("/payment-success.mp3");
+  audio.play().catch(err => {
+    console.log("Sound autoplay blocked", err);
+  });
+};
+
 const PlaceOrder = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -151,6 +158,7 @@ const PlaceOrder = () => {
         handler: function (response) {
           setLoading(false);
           toast.success("Payment Successful!");
+          playSuccessSound()
 
           navigate("/success", {
             state: {

@@ -1,12 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { X, User, Mail, Phone, Lock } from "lucide-react";
+import { X, User, Mail, Phone, Lock , EyeOff , Eye } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useUserRegisterMutation } from "../../redux/Admin/userAPI";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../redux/Admin/userSlice";
+import { toast } from "react-toastify";
+
 
 const RegisterModal = ({ onClose }) => {
+  const [showPassword, setShowPassword] = useState(false);
+
   const dispatch = useDispatch();
   const [registerUser, { isLoading }] = useUserRegisterMutation();
 
@@ -29,8 +33,14 @@ const RegisterModal = ({ onClose }) => {
     try {
       const res = await registerUser(data).unwrap();
       if (res?.user) dispatch(setUser(res));
+      toast.success("Login Success");
       onClose();
     } catch (err) {
+      const errorMsg =
+        err?.data?.message ||
+        err?.error ||
+        "Error in Register";
+      toast.error(errorMsg);
       console.log(err);
     }
   };
@@ -62,7 +72,7 @@ const RegisterModal = ({ onClose }) => {
 
         {/* FORM */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          
+
           {/* NAME */}
           <div className="relative">
             <User className="absolute left-3 top-3 text-white/40" size={18} />
@@ -118,9 +128,12 @@ const RegisterModal = ({ onClose }) => {
           </div>
 
           {/* PASSWORD */}
+          {/* PASSWORD */}
           <div className="relative">
+            {/* Lock Icon */}
             <Lock className="absolute left-3 top-3 text-white/40" size={18} />
 
+            {/* Password Input */}
             <input
               {...register("password", {
                 required: "Password is required",
@@ -133,15 +146,26 @@ const RegisterModal = ({ onClose }) => {
                   return true;
                 },
               })}
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Password"
-              className="w-full bg-black/20 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:border-indigo-400 transition"
+              className="w-full bg-black/20 border border-white/10 rounded-xl py-3 pl-10 pr-12 text-white focus:border-indigo-400 transition"
             />
 
+            {/* Eye Toggle */}
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-3 text-white/40 hover:text-white transition"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+
+            {/* Error */}
             {errors.password && (
               <p className="text-red-400 text-sm mt-1">{errors.password.message}</p>
             )}
           </div>
+
 
           {/* SUBMIT */}
           <motion.button

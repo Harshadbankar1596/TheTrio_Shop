@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import Name from "../Name";
 import { ShoppingBag, Search, User as UserIcon, Menu, X, LogOut } from "lucide-react";
 import RegisterModal from "./register";
 import LoginModal from "./loginmodel";
-import UserComponent from "./user"; 
+import UserComponent from "./user";
 import { useSelector, useDispatch } from "react-redux";
 import { setUser } from "../../redux/Admin/userSlice";
 
@@ -13,6 +13,8 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const token = user?.token;
+  const hideTimerRef = useRef(null);
+
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -31,6 +33,21 @@ const Navbar = () => {
     dispatch(setUser({ user: {}, token: "" }));
     localStorage.removeItem("token");
   };
+
+  const handleMouseEnter = () => {
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+    setShowUserCard(true);
+  };
+
+  const handleMouseLeave = () => {
+    hideTimerRef.current = setTimeout(() => {
+      setShowUserCard(false);
+    }, 2000); // ⏱ 2 seconds delay
+  };
+
 
   return (
     <>
@@ -97,9 +114,10 @@ const Navbar = () => {
               /* ======== USER PROFILE DROPDOWN ======== */
               <div className="hidden md:block relative">
                 <motion.div
-                  onMouseEnter={() => setShowUserCard(true)}
-                  onMouseLeave={() => setShowUserCard(false)}
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
                 >
+
                   <UserIcon size={24} className="text-white cursor-pointer" />
 
                   {showUserCard && (

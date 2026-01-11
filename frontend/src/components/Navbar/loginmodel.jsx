@@ -1,20 +1,27 @@
-import React from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { X, Mail, Lock } from "lucide-react";
+import { X, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useUserLoginMutation } from "../../redux/Admin/userAPI";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../redux/Admin/userSlice";
+import { toast } from "react-toastify";
 
 const LoginModal = ({ onClose }) => {
   const dispatch = useDispatch();
   const [loginUser, { isLoading }] = useUserLoginMutation();
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues : {
+      email : "gest@gmail.com",
+      password : "Gest@12345"
+    }
+  });
 
   const fadeUp = {
     hidden: { opacity: 0, y: 40 },
@@ -25,19 +32,43 @@ const LoginModal = ({ onClose }) => {
     },
   };
 
+  // const onSubmit = async (data) => {
+  //   try {
+  //     const res = await loginUser(data).unwrap();
+
+  //     if (res.error) {
+  //       return toast.error(res.error.message || "Error in Login")
+  //     }
+  //     if (res?.user) {
+  //       dispatch(setUser(res)); // ⭐ save user & token
+  //     }
+
+  //     toast.success("Login Success")
+  //     onClose();
+  //   } catch (err) {
+  //     toast.error(res.error.message || "Error in Login")
+  //     console.log(err);
+  //   }
+  // };
+
   const onSubmit = async (data) => {
     try {
       const res = await loginUser(data).unwrap();
 
-      if (res?.user) {
-        dispatch(setUser(res)); // ⭐ save user & token
-      }
-
+      dispatch(setUser(res));
+      toast.success("Login Success");
       onClose();
+
     } catch (err) {
-      console.log(err);
+      const errorMsg =
+        err?.data?.message ||
+        err?.error ||
+        "Invalid email or password";
+      toast.error(errorMsg);
+      console.log("Login Error:", err);
     }
   };
+
 
   return (
     <motion.div
@@ -82,13 +113,27 @@ const LoginModal = ({ onClose }) => {
 
           {/* PASSWORD FIELD */}
           <div className="relative">
+            {/* Lock Icon */}
             <Lock className="absolute left-3 top-3 text-white/40" size={18} />
+
+            {/* Password Input */}
             <input
               {...register("password", { required: true })}
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Password"
-              className="w-full bg-black/20 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:border-indigo-400 outline-none transition"
+              className="w-full bg-black/20 border border-white/10 rounded-xl py-3 pl-10 pr-12 text-white focus:border-indigo-400 outline-none transition"
             />
+
+            {/* Eye Icon */}
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-3 text-white/40 hover:text-white transition"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+
+            {/* Error */}
             {errors.password && (
               <p className="text-red-400 text-sm mt-1">Password is required</p>
             )}
