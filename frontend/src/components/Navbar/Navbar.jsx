@@ -111,7 +111,6 @@ const Navbar = () => {
                 </button>
               </div>
             ) : (
-              /* ======== USER PROFILE DROPDOWN ======== */
               <div className="hidden md:block relative">
                 <motion.div
                   onMouseEnter={handleMouseEnter}

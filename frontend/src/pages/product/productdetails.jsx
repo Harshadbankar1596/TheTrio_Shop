@@ -10,7 +10,7 @@ import { ShoppingBag, Star, Zap } from "lucide-react";
 import Review from "./Review.jsx";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import {ProductPageShimmer} from "./ShimmerProducts.jsx"
+import { ProductPageShimmer } from "./ShimmerProducts.jsx"
 export default function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -71,11 +71,10 @@ export default function ProductDetails() {
                 className={`
                 w-20 h-28 rounded-xl overflow-hidden border
                 transition-all duration-300
-                ${
-                  i === mainIndex
+                ${i === mainIndex
                     ? "border-[#4ad97b]"
                     : "border-[#2a2a2a] hover:border-[#3a3a3a]"
-                }
+                  }
               `}
               >
                 <img src={img} alt="" className="w-full h-full object-cover" />
@@ -146,11 +145,10 @@ export default function ProductDetails() {
                   className={`
                   w-12 h-12 rounded-full border flex items-center justify-center
                   transition-all
-                  ${
-                    selectedSize === s
+                  ${selectedSize === s
                       ? "bg-[#4ad97b] text-black border-[#4ad97b]"
                       : "border-[#3a3a3a] text-white hover:border-[#5a5a5a]"
-                  }
+                    }
                 `}
                 >
                   {s}
@@ -201,8 +199,18 @@ export default function ProductDetails() {
           {/* ACTION BUTTONS — EXACT SAME LAYOUT */}
           <div className="flex gap-4 mt-6">
             <button
+              disabled={isLoading}
               onClick={async () => {
-                if (!userId) return toast.error("Please login first");
+                if (!userId) {
+                  toast.error("Please login first");
+                  return;
+                }
+
+                if (!selectedSize) {
+                  toast.error("Please select a size");
+                  return;
+                }
+
                 try {
                   await addCartItem({
                     userId,
@@ -210,19 +218,24 @@ export default function ProductDetails() {
                     quantity: qty,
                     size: selectedSize,
                   }).unwrap();
+
                   toast.success("Added to cart!");
-                } catch {
-                  toast.error("Something went wrong");
+                } catch (error) {
+                  toast.error(
+                    error?.data?.message || "Something went wrong"
+                  );
                 }
               }}
-              className="
-              flex-1 bg-[#1d1d1f] border border-[#2d2d2d] 
-              text-white py-3 rounded-xl font-semibold 
-              hover:bg-[#2a2a2c] transition
-            "
+              className={`
+    flex-1 bg-[#1d1d1f] border border-[#2d2d2d]
+    text-white py-3 rounded-xl font-semibold
+    transition
+    ${isLoading ? "opacity-60 cursor-not-allowed" : "hover:bg-[#2a2a2c]"}
+  `}
             >
-              Add to Cart
+              {isLoading ? "Adding..." : "Add to Cart"}
             </button>
+
 
             {!product.isActive ? (
               <div
