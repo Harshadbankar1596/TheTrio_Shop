@@ -13,7 +13,7 @@ router.get(
   userController.getProductBycategory
 );
 router.get("/product/:productId", userController.getproductById);
-router.post("/cart/add", authMiddleware ,  userController.addcartitem);
+router.post("/cart/add" ,  userController.addcartitem);
 router.get("/cart/:userId",  userController.getCartItems);
 router.post("/add-address", authMiddleware ,  userController.addAddress);
 router.get("/get-alladdress/:userId", userController.getAllAddress);
