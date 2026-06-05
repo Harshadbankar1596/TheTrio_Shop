@@ -116,10 +116,10 @@ const MyOrders = () => {
 
                   <div className="text-right">
                     <p className="font-semibold">
-                      ₹{item.product.finalPrice.toFixed(2)}
+                      ₹{(item.product.finalPrice * item.quantity).toFixed(2)}
                     </p>
                     <p className="text-gray-400 text-sm line-through">
-                      ₹{item.product.price}
+                      ₹{(item.product.price * item.quantity).toFixed(2)}
                     </p>
                   </div>
                 </div>
@@ -197,7 +197,7 @@ const MyOrders = () => {
                   Total: ₹{order.TotalAmount.toFixed(2)}
                 </p>
                 <p className="text-gray-400 text-sm">
-                  Discount: ₹{order.TotalDiscount}
+                  Discount: ₹{Number(order.TotalDiscount).toFixed(2)}
                 </p>
               </div>
 
